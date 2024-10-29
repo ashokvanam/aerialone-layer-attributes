@@ -54,11 +54,11 @@
                 var row = document.createElement('tr');
                 var col1 =  document.createElement('td');
                 var col2 = document.createElement('td');
+                if (geoAttributes[prop] == null){
+                        continue;
+                }
                 
-                if (prop.includes('Field_Name')){                
-                    if(prop == 'Field_Name_39'){
-                        console.log(prop);
-                    }
+                if (prop.includes('Field_Name')){ 
                     var revisedCol = prop.replace('Name','Data');
                     if (geoAttributes[prop] == null){
                         continue;
