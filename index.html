@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aerial One Attributes</title>
     <style>
+        a{
+            color:#00ffc5 ;
+        }
         div{
             color: #00ffc5;
             background-color: black;
@@ -48,6 +51,25 @@
             }
             xhttp.send();
         }
+        function isValidUrl(urlString){
+            var inputElement = document.createElement('input');
+            inputElement.type = 'url';
+            inputElement.value = urlString;
+
+            if (!inputElement.checkValidity()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        function createHyperLink(url){
+            var inputElement = document.createElement('a');
+            inputElement.href = url;
+            inputElement.target = "_blank";
+            inputElement.innerHTML = "View";
+            
+            return inputElement.outerHTML;
+        }
         function displayJSONAsTable(geoAttributes) {
             var tab = document.createElement('table');
             tab.setAttribute('border','1');
@@ -65,15 +87,23 @@
                     if (geoAttributes[prop] == null){
                         continue;
                     }
+                    var attributeValue = geoAttributes[revisedCol];
+                    if (isValidUrl(attributeValue)){
+                        attributeValue = createHyperLink(attributeValue);
+                    }
                     col1.innerHTML = geoAttributes[prop];
-                    col2.innerHTML = geoAttributes[revisedCol];
+                    col2.innerHTML = attributeValue
                 }
                 else if(prop.includes('Field_Data')){
                     continue;
                 }
                 else{
+                    var attributeValue = geoAttributes[prop];
+                    if (isValidUrl(attributeValue)){
+                        attributeValue = createHyperLink(attributeValue);
+                    }
                     col1.innerHTML = prop;
-                    col2.innerHTML = geoAttributes[prop];
+                    col2.innerHTML = attributeValue;
                 }
                 
                 row.appendChild(col1);
