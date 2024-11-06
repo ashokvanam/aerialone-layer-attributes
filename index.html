@@ -70,6 +70,10 @@
             
             return inputElement.outerHTML;
         }
+        function convertToDateTime(date_number){
+            var date = new Date(date_number);
+            return date.toUTCString();
+        }
         function displayJSONAsTable(geoAttributes) {
             var tab = document.createElement('table');
             tab.setAttribute('border','1');
@@ -101,6 +105,9 @@
                     var attributeValue = geoAttributes[prop];
                     if (isValidUrl(attributeValue)){
                         attributeValue = createHyperLink(attributeValue);
+                    }
+                    if (prop == 'Date_Built' || prop == 'Date_Of_Gather'){
+                        attributeValue = convertToDateTime(attributeValue);
                     }
                     col1.innerHTML = prop;
                     col2.innerHTML = attributeValue;
