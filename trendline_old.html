@@ -59,7 +59,7 @@
                 console.log(`${day}/${month}/${year}`); // DD/MM/YYYY
                 console.log(`${month}-${day}-${year}`); // MM-DD-YYYY
             }
-            function listExceptionType(exceptionType){
+            function addExceptionType(exceptionType){
                 if (_exceptionTypes.includes(exceptionType)){
                     return;
                 }
@@ -70,8 +70,10 @@
                 items.appendChild(item);
                 _exceptionTypes.push(exceptionType);
             }
-
-            function csvToDatasetByException(csvData,locid,exceptionType,fdate='',tdate=''){
+            function listExceptions(){
+                
+            }
+            function csvToDataset(csvData,exceptionType='',fdate='',tdate='',locid=''){
                 var t_exectpionType = '';
                 var dateSeries = [];
                 var measureDataset = {
@@ -83,10 +85,12 @@
                         data: [], borderWidth:1,borderColor:'#ff0000'
                     };
                 var threatenedDataset = {
-                    label:"Threatened",
+                    label:"",
                     data: [], borderWidth:1,borderColor:'#ffff00'
                 };
-
+                if (exceptionType && locid){
+                        addExceptionType(exceptionType);
+                    }
                 for (var i in csvData){
 
                     var each = csvData[i];
@@ -96,10 +100,23 @@
                     if (locid && each.LOC_ID != locid){
                         continue;
                     }
-                    if (exceptionType && each.Title != exceptionType){
-                        continue;
-                    }
+                    // if (exceptionType && each.Title != exceptionType){
+                    //     continue;
+                    // }
                     const measuredDate = new Date(each.Date);
+                    if (locid && !exceptionType){
+                        if (!t_exectpionType){
+                            t_exectpionType = each.Title;
+                            addExceptionType(each.Title);
+                        }
+                        if (t_exectpionType != each.Title){
+                            t_exectpionType = each.Title;
+                            addExceptionType(each.Title);
+                            
+                        }
+                    }
+                    
+                    
                     if (fdate =='' && tdate ==''){
                         var tempDate = new Date();
                         tempDate = measuredDate;
@@ -154,101 +171,6 @@
                     dateSeries: dateSeries,
                     dataSet:[measureDataset,degradedDataset,threatenedDataset],
                     exceptionType:exceptionType
-                }
-                return chartDataset;
-            }
-            function csvToDataset(csvData,locid,fdate='',tdate=''){
-                var t_exectpionType = '';
-                var dateSeries = [];
-                var measureDataset = {
-                        label:"Measurement",
-                        data: [], borderWidth:1,borderColor:'#00ff00'
-                    };
-                var degradedDataset = {
-                        label:"Degraded",
-                        data: [], borderWidth:1,borderColor:'#ff0000'
-                    };
-                var threatenedDataset = {
-                    label:"",
-                    data: [], borderWidth:1,borderColor:'#ffff00'
-                };
-              
-                for (var i in csvData){
-
-                    var each = csvData[i];
-                    if (each.Measurement == 0){
-                        continue;
-                    }
-                    if (locid && each.LOC_ID != locid){
-                        continue;
-                    }
-                    // if (exceptionType && each.Title != exceptionType){
-                    //     continue;
-                    // }
-                    const measuredDate = new Date(each.Date);
-                    
-                    // if (!t_exectpionType){
-                    //     t_exectpionType = each.Title;
-                    //     addExceptionType(each.Title);
-                    // }
-                    if (!t_exectpionType || (t_exectpionType != each.Title)){
-                        t_exectpionType = each.Title;
-                        listExceptionType(each.Title);
-                        
-                    }
-                    if (fdate =='' && tdate ==''){
-                        var tempDate = new Date();
-                        tempDate = measuredDate;
-                        fdate =  getDateString(tempDate);
-                        document.getElementById('fDateSelected').value = fdate;
-                        tempDate.setMonth(tempDate.getMonth()+ 3);
-                        tdate = getDateString(tempDate);
-                        document.getElementById('tDateSelected').value = tdate;
-                        
-                    }
-                    if (fdate !='' && tdate !=''){
-                        var fromDate = new Date(fdate);
-                        var toDate = new Date(tdate);
-                        if (!(measuredDate >= fromDate && measuredDate <= toDate)){
-                            continue;
-                        }
-                    }
-                    var measureValue = each.Measurement;
-                    if (t_exectpionType == 'Event Time'){
-                         var timeString = each.Measurement;
-                         var dateString = "23-DEC-2024";
-                         var date =  (timeString, "HH:mm:ss", new Date());
-                         measureDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //measureDataset.data.push(each.Measurement);
-
-                         timeString = each.Yellow;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         threatenedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //threatenedDataset.data.push(each.Yellow);
-
-                         timeString = each.Red;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         degradedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //degradedDataset.data.push(each.Red);
-
-
-                    }
-                    else {
-                        measureDataset.data.push(measureValue);
-                        degradedDataset.data.push(each.Red);
-                        threatenedDataset.data.push(each.Yellow);
-                    }
-                    
-                    
-                   // const utcDate = new Date(each.Date); // UTC time
-                   // const localDate = new Date(utcDate.toDateString); // Converts to local time
-                    dateSeries.push(each.Date);
-                   
-                }
-                var chartDataset ={
-                    dateSeries: dateSeries,
-                    dataSet:[measureDataset,degradedDataset,threatenedDataset],
-                    exceptionType:_exceptionTypes[0]
                 }
                 return chartDataset;
             }
@@ -465,7 +387,14 @@
                     trendlineData = _trendlineData;
                 }
                 const params = new URLSearchParams(window.location.search);
-                var locid = params.get('locid')?params.get('locid'):'';                
+                var exceptionType = params.get('type');
+                // var fromDate = params.get("fdate");
+                // var toDate = params.get("tdate");
+                var x = params.get('x');
+                var y = params.get('y');
+                var z = params.get('z');
+                var locid = params.get('locid')?params.get('locid'):'';
+                
                 var fromDate = document.getElementById('fDateSelected').value;
                 var toDate = document.getElementById('tDateSelected').value;
                 var exceptionType = document.getElementById('selExceptionTypes').value;
@@ -476,14 +405,7 @@
                 //     return;   
                 //     }
                 //var chartDataSet = featuresToDataSet(trendlineData.features);
-                var chartDataset = null;
-                if (exceptionType){
-                    chartDataSet = csvToDatasetByException(trendlineData,locid,exceptionType,fromDate,toDate);
-                } 
-                else{
-                    chartDataSet = csvToDataset(trendlineData,locid,fromDate,toDate);
-                    chartDataSet = csvToDatasetByException(trendlineData,locid,chartDataSet.exceptionType,fromDate,toDate);
-                }
+                var chartDataSet = csvToDataset(trendlineData,exceptionType,fromDate,toDate,locid);
                 if (!exceptionType){
                     exceptionType = chartDataSet.exceptionType;
                 }
@@ -504,17 +426,7 @@
             padding: 0;
             box-sizing: border-box;
             }
-            select {
-                position: absolute;
 
-                top: 1%;
-                
-                background-color: black;
-                color: white;
-                border: 1px solid #ccc;
-                padding: 5px;
-                border-radius: 4px;
-            }
             html, body {
                 
                 width: 100%;
@@ -555,9 +467,6 @@
                 width: 100%;
                 height: 100%;
             }
-            /* #divExcetpionList{
-                width: 100%;
-            } */
             table{                
                 width: 100%;
             }
@@ -571,8 +480,8 @@
     </head>
     <body onload="readTrendlineData()">
         <div id="divDateControls" class="fixed-top">
-            From:<input type="date" id="fDateSelected" placeholder="YYYY-MM-DD"  >
-            To:<input type="date" id="tDateSelected"  placeholder="YYYY-MM-DD">
+            From:<input type="date" id="fDateSelected"  >
+            To:<input type="date" id="tDateSelected" >
             <button onclick="onDateChange()">Refresh</button>
         </div>
         <br>
@@ -584,7 +493,7 @@
                         <canvas id="myChart" ></canvas>
                       
                 </td>
-                <td style="width: 10%;">
+                <td style="width: 20%;">
                     <div id="divExcetpionList">
                         <select id="selExceptionTypes" onchange="onLoad()">
 
