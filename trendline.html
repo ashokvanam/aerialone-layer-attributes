@@ -427,7 +427,8 @@
                                 ticks:{
                                     color: 'green',
                                     font: {
-                                    size: 14
+                                    size: 14,
+                                    
                                     }
                                 }
                             } ,
@@ -499,103 +500,111 @@
             
           </script>
           <style>
-             
-            select {
-                width:auto;
-                background-color: black;
-                color: white;
-                border: 1px solid #ccc;
-                padding: 5px;
-                border-radius: 4px;
+            /* General reset */
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
             }
-            html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
+        
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
             }
-          
-             #divChart {
-                
-                border-color: #00ffc5;
-                position: absolute;
-                color: #00ffc5;
-                background-color: black;
-                
-                width: 100%;
-                
-                
+        
+            #divChart {
+              width: 100%;
+              max-width: 1200px;
+              margin: 0 auto;
             }
-            .fixed-top {
-                color: #00ffc5;
-                border-style: groove;
-                position: absolute;
-                align-items: center;    
-                top:5%;            
-                height: 2%;
-                left: 65%;
-                zoom: 80%;
-                
-                border-color: #00ffc5;
-                background-color: black; /* Example background color */
-                
-                padding: 10px;
-                z-index: 1000; /* Ensures it stays above other elements */
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow for better visibility */
+        
+            table {
+              width: 100%;
+              border-collapse: collapse;
             }
-            #myChart{
-                width: 100%;
-                height: 100%;
-            }
-            
-            /* #divExcetpionList{
-                width: 100%;
-            } */
-            button{
-                border-radius: 4px;
-                
-            }
+        
             td {
-                    border: solid 2px #00ffc5;
-                    vertical-align: top;
-                    text-align: center;
-                }
-                /* #divExcetpionList{
-                    height: 100%;
-                } */
+              vertical-align: top;
+              padding: 10px;
+            }
+        
+            #myChart {
+              width: 100%;
+              height: 400px; /* Set a fixed height for better layout */
+            }
+        
+            #divExcetpionList {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
+            }
+        
+            #divDateControls {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+            }
+        
+            #divDateControls input, #divDateControls button {
+              padding: 8px;
+              font-size: 14px;
+            }
+        
+            #selExceptionTypes {
+              width: 100%;
+              height: 150px; /* Adjust height for better visibility */
+              padding: 8px;
+              font-size: 14px;
+            }
+        
+            button {
+              cursor: pointer;
+            }
+        
+            @media (max-width: 768px) {
+              table {
+                display: block;
+              }
+        
+              td {
+                display: block;
+                width: 100%;
+              }
+        
+              #myChart {
+                height: 300px; /* Adjust chart height for smaller screens */
+              }
+        
+              #selExceptionTypes {
+                height: 100px;
+              }
+            }
           </style>
     </head>
     <body onload="readTrendlineData()">
         <div id="divChart">     
-        <table >
+          <table>
             <tr>
-                <td colspan="2">
-                    <div id="divDateControls" >
-                        From:<input type="date" id="fDateSelected" placeholder="YYYY-MM-DD"  >
-                        To:<input type="date" id="tDateSelected"  placeholder="YYYY-MM-DD">
-                        <button onclick="onDateChange()">Refresh</button>
-                    </div>
-                </td>
+              <td style="width: 80%;">
+                <canvas id="myChart"></canvas>
+              </td>
+              <td style="width: 20%;">
+                <div id="divExcetpionList">
+                  <div id="divDateControls">
+                    From: <input type="date" id="fDateSelected" placeholder="YYYY-MM-DD">
+                    To: <input type="date" id="tDateSelected" placeholder="YYYY-MM-DD">
+                    <button onclick="onDateChange()">Refresh</button>
+                  </div>
+                  <select id="selExceptionTypes" onchange="onLoad()" multiple>
+                    <!-- Options will be dynamically populated -->
+                  </select>
+                </div>
+              </td>
             </tr>
-            <tr>
-                <td style="width: 80%;">
-                           
-                        <canvas id="myChart" ></canvas>
-                      
-                </td>
-                <td style="width: 10%;">
-                    <div id="divExcetpionList">
-                        <select id="selExceptionTypes" onchange="onLoad()">
-
-                        </select>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-        </body>
-        
-    </body>
+          </table>
+        </div>
+      </body>
   
       
 </html>
