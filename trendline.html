@@ -499,16 +499,9 @@
             
           </script>
           <style>
-             * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            }
+             
             select {
-                position: absolute;
-
-                top: 1%;
-                
+                width:auto;
                 background-color: black;
                 color: white;
                 border: 1px solid #ccc;
@@ -516,32 +509,31 @@
                 border-radius: 4px;
             }
             html, body {
-                
-                width: 100%;
-                overflow: hidden; /* Prevent scrolling */
-                padding-top: 50px; /* Adjust to the height of the fixed div */
-                    background-color: black;
-                    
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
             }
           
              #divChart {
-                border-style: dotted;
+                
                 border-color: #00ffc5;
                 position: absolute;
                 color: #00ffc5;
                 background-color: black;
-                top:5%;
+                
                 width: 100%;
-                height: 100%;
+                
                 
             }
             .fixed-top {
                 color: #00ffc5;
                 border-style: groove;
                 position: absolute;
-                align-items: center;                
-                top: 0;
-                left: 35%;
+                align-items: center;    
+                top:5%;            
+                height: 2%;
+                left: 65%;
                 zoom: 80%;
                 
                 border-color: #00ffc5;
@@ -555,29 +547,36 @@
                 width: 100%;
                 height: 100%;
             }
+            
             /* #divExcetpionList{
                 width: 100%;
             } */
-            table{                
-                width: 100%;
+            button{
+                border-radius: 4px;
+                
             }
             td {
                     border: solid 2px #00ffc5;
+                    vertical-align: top;
+                    text-align: center;
                 }
-                #divExcetpionList{
+                /* #divExcetpionList{
                     height: 100%;
-                }
+                } */
           </style>
     </head>
     <body onload="readTrendlineData()">
-        <div id="divDateControls" class="fixed-top">
-            From:<input type="date" id="fDateSelected" placeholder="YYYY-MM-DD"  >
-            To:<input type="date" id="tDateSelected"  placeholder="YYYY-MM-DD">
-            <button onclick="onDateChange()">Refresh</button>
-        </div>
-        <br>
         <div id="divChart">     
-        <table style="width:100%">
+        <table >
+            <tr>
+                <td colspan="2">
+                    <div id="divDateControls" >
+                        From:<input type="date" id="fDateSelected" placeholder="YYYY-MM-DD"  >
+                        To:<input type="date" id="tDateSelected"  placeholder="YYYY-MM-DD">
+                        <button onclick="onDateChange()">Refresh</button>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td style="width: 80%;">
                            
