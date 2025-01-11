@@ -500,118 +500,131 @@
             
           </script>
           <style>
-            /* General reset */
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-        
             body {
-              font-family: Arial, sans-serif;
-              padding: 20px;
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 10px;
+                box-sizing: border-box;
+                background-color: black;
             }
-        
+    
             #divChart {
-              width: 100%;
-              max-width: 1200px;
-              margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
             }
-        
-            table {
-              width: 100%;
-              border-collapse: collapse;
+    
+            #divChart > div {
+                flex: 1;
             }
-        
-            td {
-              vertical-align: top;
-              padding: 10px;
-            }
-        
-            #myChart {
-              width: 100%;
-              height: 400px; /* Set a fixed height for better layout */
-            }
-        
-            #divExcetpionList {
-              display: flex;
-              flex-direction: column;
-              align-items: flex-start;
-              gap: 10px;
-            }
-        
-            #divDateControls {
-              display: flex;
-              flex-direction: column;
-              gap: 10px;
-              color: #0070ff;
-        
-            }
-            button{
-                border-radius: 4px;
-                color: #0070ff;
-            }
-            #divDateControls input, #divDateControls button {
-              padding: 8px;
-              font-size: 14px;
-         
-            }
-        
-            #selExceptionTypes {
-              width: 100%;
-              height: 150px; /* Adjust height for better visibility */
-              padding: 8px;
-              font-size: 14px;
-
-            }
-        
-            button {
-              cursor: pointer;
-            }
-        
-            @media (max-width: 768px) {
-              table {
-                display: block;
-              }
-        
-              td {
-                display: block;
+    
+            canvas {
                 width: 100%;
-              }
-        
-              #myChart {
-                height: 300px; /* Adjust chart height for smaller screens */
-              }
-        
-              #selExceptionTypes {
-                height: 100px;
-              }
+                max-width: 600px; /* Set a maximum width for the chart */
+                height: auto; /* Maintain aspect ratio */
+                border: 1px solid #ddd; /* Optional for debugging */
             }
-          </style>
+    
+            #divExcetpionList {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+    
+            #divDateControls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+    
+            label {
+                flex: 1 1 100%; /* Labels take full width */
+                font-size: 0.9rem;
+            }
+    
+            input[type="date"], select, button {
+                flex: 1 1 calc(50% - 10px); /* Two items per row on small screens */
+                padding: 10px;
+                font-size: 1rem;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+    
+            select {
+                height: auto;
+                min-height: 150px;
+            }
+    
+            button {
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                border: none;
+                flex: 1 1 100%; /* Full width for button */
+            }
+    
+            button:hover {
+                background-color: #0056b3;
+            }
+    
+            @media (min-width: 768px) {
+                #divChart {
+                    flex-direction: row;
+                    align-items: flex-start;
+                }
+    
+                #divChart > div:first-child {
+                    flex: 3;
+                }
+    
+                #divExcetpionList {
+                    flex: 1;
+                    max-width: 300px;
+                }
+    
+                #divDateControls input[type="date"], 
+                #divDateControls select, 
+                #divDateControls button {
+                    flex: 1 1 100%; /* Full width for desktop inputs */
+                }
+            }
+        </style>
     </head>
     <body onload="readTrendlineData()">
-        <div id="divChart">     
-          <table>
-            <tr>
-              <td style="width: 80%;">
-                <canvas id="myChart"></canvas>
-              </td>
-              <td style="width: 20%;">
-                <div id="divExcetpionList">
-                  <div id="divDateControls">
-                    From: <input type="date" id="fDateSelected" placeholder="YYYY-MM-DD">
-                    To: <input type="date" id="tDateSelected" placeholder="YYYY-MM-DD">
+        <div id="divChart">
+            <div>
+                <canvas id="myChart" ></canvas>
+            </div>
+            <div id="divExcetpionList">
+                <div id="divDateControls">
+                    <label for="fDateSelected">From:</label>
+                    <input type="date" id="fDateSelected" placeholder="YYYY-MM-DD">
+                    <label for="tDateSelected">To:</label>
+                    <input type="date" id="tDateSelected" placeholder="YYYY-MM-DD">
                     <button onclick="onDateChange()">Refresh</button>
-                  </div>
-                  <select id="selExceptionTypes" onchange="onLoad()" size="5" >
-                    <!-- Options will be dynamically populated -->
-                  </select>
                 </div>
-              </td>
-            </tr>
-          </table>
+                <select id="selExceptionTypes" onchange="onLoad()" size="5">
+                    <!-- Options will be dynamically populated -->
+                </select>
+            </div>
         </div>
-      </body>
+    
+        <!-- <script>
+            function readTrendlineData() {
+                // Placeholder function to prevent errors
+                console.log("Trendline data loaded");
+            }
+    
+            function onDateChange() {
+                alert("Date range changed");
+            }
+    
+            function onLoad() {
+                alert("Exception type changed");
+            }
+        </script> -->
+    </body>
   
       
 </html>
