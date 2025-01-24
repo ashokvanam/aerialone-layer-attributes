@@ -762,6 +762,8 @@
                     _exceptionTypes.forEach((exceptionType,i,_exceptionTypes)=>{
                         chartDataSet = csvToDatasetByException(_trendlineData,_locid,exceptionType,fromDate,toDate);
                         if (i==0){
+                            chartDataSet.dataSet[0].backgroundColor = '#00ff00';
+                            chartDataSet.dataSet[0].borderColor = '#00ff00';
                             _chartDataset =  mergeDataSets(chartDataSet);
                         }
                         else{
