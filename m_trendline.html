@@ -187,18 +187,33 @@
             }
             function csvToDatasetByException(csvData,locid,exceptionType,fdate='',tdate=''){
                 var t_exectpionType = '';
+                var t_itemType = '';
                 var dateSeries = [];
+                var measuredValueColour = getRandomHexColor()
                 var measureDataset = {
-                        label:exceptionType,
-                        data: [], borderWidth:1,borderColor:getRandomHexColor()
+                        label: exceptionType,
+                        data: [
+                            // { x: 0, y: 0 },
+                            // { x: 1, y: 1.5 },
+                            // { x: 2, y: 2.5 },
+                            // { x: 3, y: 13 },
+                            // { x: 4, y: 40 },
+                        ],
+                        borderColor: measuredValueColour,
+                        backgroundColor: measuredValueColour,
+                        showLine: true, // Connect points with a line
                     };
                 var degradedDataset = {
                         label:"Degraded",
-                        data: [], borderWidth:1,borderColor:'#ff0000'
+                        data: [],  borderColor: 'rgba(255, 0, 0, 1)',
+                        backgroundColor:  'rgba(255, 0, 0, 1)',
+                        showLine: true, // Connect points with a line
                     };
                 var threatenedDataset = {
                     label:"Threatened",
-                    data: [], borderWidth:1,borderColor:'#ffff00'
+                    data: [], borderColor: 'rgba(255, 255, 0, 1)',
+                        backgroundColor:  'rgba(255, 255, 0, 1)',
+                        showLine: true, // Connect points with a line
                 };
 
                 for (var i in csvData){
@@ -253,16 +268,19 @@
 
                     }
                     else {
-                        measureDataset.data.push(measureValue);
-                        degradedDataset.data.push(each.Red);
-                        threatenedDataset.data.push(each.Yellow);
+                        // measureDataset.data.push(measureValue);
+                        // degradedDataset.data.push(each.Red);
+                        // threatenedDataset.data.push(each.Yellow);
+                        measureDataset.data.push({x:new Date(each.Date),y:measureValue});
+                        degradedDataset.data.push({x:new Date(each.Date),y:each.Red});
+                        threatenedDataset.data.push({x:new Date(each.Date),y:each.Yellow});
                     }
                     
                     
                    // const utcDate = new Date(each.Date); // UTC time
                    // const localDate = new Date(utcDate.toDateString); // Converts to local time
                    
-                    dateSeries.push(each.Date);
+                    //dateSeries.push(each.Date);
                    
                 }
                 var chartDataset ={
@@ -413,10 +431,10 @@
                     _chart = new Chart(chartCtrl, {
                         type: chartType,
                         data: {
-                        labels: labels,
                         datasets:datasets
                         },
                         options: {
+                            responsive: true,
                             plugins: {
                                 title: {
                                     display: true, // Enable the title
@@ -431,19 +449,23 @@
                                     },
                                     color: 'rgb(75, 192, 192)' // Text color
                                 },
-                                // tooltip: {
-                                //     callbacks: {
-                                //     label: function(context) {
-                                //         console.log(context);
-                                //         var e = context.raw;
-                                //     // e= e.replaceAll(",","");
-                                //     var timeString = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                //     var label = "Measurement:"+ timeString
-                                //         return label;
-                                //     //  return new Date(context.formattedvalue).toTimeString();
-                                //     }
-                                //     }
-                                // }
+                                tooltip: {
+                                    callbacks: {
+                                    label: function(context) {
+                                        console.log(context);
+                                         var e = context.raw.x; //Date time
+                                         var y = context.raw.y; //measure value
+                                    // // e= e.replaceAll(",","");
+                                    var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                    var eventTime =  new Date(e).toDateString() + ' ' + time ;
+                                     //var timeString = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                     var label = "Measurement:"+ y
+                                     label = label + ' at ' + eventTime;
+                                         return label;
+                                    //  return new Date(context.formattedvalue).toTimeString();
+                                    }
+                                    }
+                                }
                             },
                            
                             scales: {
@@ -481,10 +503,11 @@
                                     font: {
                                     size: 14
                                     },
-                                    // callback:function(e){
-                                    //         console.log('ticks:' + e)
-                                    //         return  new Date(e).toDateString() ;
-                                    //     },
+                                    callback:function(e){
+                                            //console.log('ticks:' + e)
+                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                            return  new Date(e).toDateString() + ' ' + time ;
+                                        },
                                 }
                             } 
                             
@@ -627,7 +650,7 @@
                         }
                     });
                     const ctx = document.getElementById('myChart');
-                    InitChart(ctx,'line',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
+                    InitChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
                 }
             }
             function onLoad(trendlineData){

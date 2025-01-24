@@ -188,31 +188,17 @@
             function csvToDatasetByException(csvData,locid,exceptionType,fdate='',tdate=''){
                 var t_exectpionType = '';
                 var dateSeries = [];
-                var measuredValueColour = getRandomHexColor()
                 var measureDataset = {
-                        label: exceptionType,
-                        data: [
-                            // { x: 0, y: 0 },
-                            // { x: 1, y: 1.5 },
-                            // { x: 2, y: 2.5 },
-                            // { x: 3, y: 13 },
-                            // { x: 4, y: 40 },
-                        ],
-                        borderColor: measuredValueColour,
-                        backgroundColor: measuredValueColour,
-                        showLine: true, // Connect points with a line
+                        label:exceptionType,
+                        data: [], borderWidth:1,borderColor:getRandomHexColor()
                     };
                 var degradedDataset = {
                         label:"Degraded",
-                        data: [],  borderColor: 'rgba(255, 0, 0, 1)',
-                        backgroundColor:  'rgba(255, 0, 0, 1)',
-                        showLine: true, // Connect points with a line
+                        data: [], borderWidth:1,borderColor:'#ff0000'
                     };
                 var threatenedDataset = {
                     label:"Threatened",
-                    data: [], borderColor: 'rgba(255, 255, 0, 1)',
-                        backgroundColor:  'rgba(255, 255, 0, 1)',
-                        showLine: true, // Connect points with a line
+                    data: [], borderWidth:1,borderColor:'#ffff00'
                 };
 
                 for (var i in csvData){
@@ -267,19 +253,16 @@
 
                     }
                     else {
-                        // measureDataset.data.push(measureValue);
-                        // degradedDataset.data.push(each.Red);
-                        // threatenedDataset.data.push(each.Yellow);
-                        measureDataset.data.push({x:new Date(each.Date),y:measureValue});
-                        degradedDataset.data.push({x:new Date(each.Date),y:each.Red});
-                        threatenedDataset.data.push({x:new Date(each.Date),y:each.Yellow});
+                        measureDataset.data.push(measureValue);
+                        degradedDataset.data.push(each.Red);
+                        threatenedDataset.data.push(each.Yellow);
                     }
                     
                     
                    // const utcDate = new Date(each.Date); // UTC time
                    // const localDate = new Date(utcDate.toDateString); // Converts to local time
                    
-                    //dateSeries.push(each.Date);
+                    dateSeries.push(each.Date);
                    
                 }
                 var chartDataset ={
@@ -430,10 +413,10 @@
                     _chart = new Chart(chartCtrl, {
                         type: chartType,
                         data: {
+                        labels: labels,
                         datasets:datasets
                         },
                         options: {
-                            responsive: true,
                             plugins: {
                                 title: {
                                     display: true, // Enable the title
@@ -498,10 +481,10 @@
                                     font: {
                                     size: 14
                                     },
-                                    callback:function(e){
-                                            //console.log('ticks:' + e)
-                                            return  new Date(e).toDateString() ;
-                                        },
+                                    // callback:function(e){
+                                    //         console.log('ticks:' + e)
+                                    //         return  new Date(e).toDateString() ;
+                                    //     },
                                 }
                             } 
                             
@@ -644,7 +627,7 @@
                         }
                     });
                     const ctx = document.getElementById('myChart');
-                    InitChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
+                    InitChart(ctx,'line',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
                 }
             }
             function onLoad(trendlineData){
