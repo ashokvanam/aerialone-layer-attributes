@@ -324,13 +324,14 @@
                     //     t_exectpionType = each.Title;
                     //     addExceptionType(each.Title);
                     // }
-                    if (each.Title == 'Event Time'){
-                        continue;
-                    }
+                    
                     if (!t_exectpionType || (t_exectpionType != each.Title)){
                         t_exectpionType = each.Title;
                         measureDataset.label = each.Title
                         listExceptionType(each.Title);
+                        if (each.Title == 'Event Time'){
+                            continue;
+                        }
                         
                     }
                     if (fdate =='' && tdate ==''){
@@ -380,6 +381,9 @@
                    // const utcDate = new Date(each.Date); // UTC time
                    // const localDate = new Date(utcDate.toDateString); // Converts to local time
                     dateSeries.push(each.Date);
+                    if (dateSeries.length > 10000){
+                        break;
+                    }
                    
                 }
                 var chartDataset ={
@@ -806,19 +810,28 @@
                 //     chartDataSet = csvToDataset(trendlineData,locid,fromDate,toDate);
                 //     chartDataSet = csvToDatasetByException(trendlineData,locid,chartDataSet.exceptionType,fromDate,toDate);
                 // }
+                
+                console.log(new Date(Date.now()).toTimeString())
+                console.log('Data Loaded');
                 chartDataSet = csvToDataset(trendlineData,_locid,fromDate,toDate);
+                console.log(new Date(Date.now()).toTimeString())
+                console.log('Data Selected');
                 // chartDataSet = csvToDatasetByException(trendlineData,locid,chartDataSet.exceptionType,fromDate,toDate);
                 // if (!exceptionType){
                 //     exceptionType = chartDataSet.exceptionType;
                 // }
+              
                 
 
                 if (chartDataSet.exceptionType == 'Event Time'){
                     InitChartEventType(ctx,'line',chartDataSet.dateSeries,chartDataSet.dataSet,chartDataSet.exceptionType);
+               
                 }
                 else{
                     InitChart(ctx,'line',chartDataSet.dateSeries,chartDataSet.dataSet,chartDataSet.exceptionType);
                 }
+                console.log(new Date(Date.now()).toTimeString())
+                console.log('Data Plotted');
             }
             
           </script>
