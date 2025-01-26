@@ -243,6 +243,8 @@
                     if (fdate !='' && tdate !=''){
                         var fromDate = new Date(fdate);
                         var toDate = new Date(tdate);
+                        document.getElementById('fDateSelected').value = fdate;
+                        document.getElementById('tDateSelected').value = tdate;
                         if (!(measuredDate >= fromDate && measuredDate <= toDate)){
                             continue;
                         }
@@ -250,8 +252,9 @@
                     var measureValue = each.Measurement;
                     if (exceptionType == 'Event Time'){
                          var timeString = each.Measurement;
-                         var dateString = "23-DEC-2024";
+                         var dateString = "01-JAN-2000";
                          var date =  (timeString, "HH:mm:ss", new Date());
+                         //Date.parse(dateString + " " + timeString)}
                          measureDataset.data.push({x: new Date(each.Date),y: Date.parse(dateString + " " + timeString)});
                          //measureDataset.data.push(each.Measurement);
 
@@ -275,7 +278,12 @@
                         degradedDataset.data.push({x:new Date(each.Date),y:each.Red});
                         threatenedDataset.data.push({x:new Date(each.Date),y:each.Yellow});
                     }
-                    
+                    if (measureDataset.data.length>10000){
+                        tdate = getDateString(new Date(each.Date));
+                        document.getElementById('tDateSelected').value = tdate;
+                        break;
+                       
+                    }
                     
                    // const utcDate = new Date(each.Date); // UTC time
                    // const localDate = new Date(utcDate.toDateString); // Converts to local time
@@ -293,6 +301,7 @@
             function csvToDataset(csvData,locid,fdate='',tdate=''){
                 var t_exectpionType = '';
                 var dateSeries = [];
+                let counter = 0;
                 var measureDataset = {
                         label:"Measurement",
                         data: [], borderWidth:1,borderColor:'#00ff00'
@@ -327,11 +336,17 @@
                     
                     if (!t_exectpionType || (t_exectpionType != each.Title)){
                         t_exectpionType = each.Title;
-                        measureDataset.label = each.Title
+                        
                         listExceptionType(each.Title);
+                        counter++;                        
+                        
                         if (each.Title == 'Event Time'){
                             continue;
                         }
+                        if (counter>1){
+                            continue;
+                        }
+                        measureDataset.label = each.Title
                         
                     }
                     if (fdate =='' && tdate ==''){
@@ -392,6 +407,17 @@
                     exceptionType:measureDataset.label
                 }
                 return chartDataset;
+            }
+            function isDateWithinRange(in_date){
+                let fDate = '01-JAN-1999'
+                let tDate = '01-JAN-2001';
+                fDate = Date.parse(fDate);
+                tDate = Date.parse(tDate);
+                if (in_date >= fDate && in_date <= tDate){
+                    return true;
+                }
+                return false;
+        
             }
             function featuresToDataSet(features){
                 
@@ -571,9 +597,13 @@
                                          var e = context.raw.x; //Date time
                                          var y = context.raw.y; //measure value
                                     // // e= e.replaceAll(",","");
-                                    var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                    var time = String(new Date(e).getHours()).padStart(2,'0') + ":"+ String(new Date(e).getMinutes()).padStart(2,'0') + ":"+String(new Date(e).getSeconds()).padStart(2,'0');
                                     var eventTime =  new Date(e).toDateString() + ' ' + time ;
-                                     //var timeString = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                    if(isDateWithinRange(y)){
+                                        y = new Date(y).getHours() + ":"+ new Date(y).getMinutes() + ":"+new Date(y).getSeconds();
+                                    }
+
+                                     
                                      var label = "Measurement:"+ y
                                      label = label + ' at ' + eventTime;
                                          return label;
@@ -600,13 +630,19 @@
                                     font: {
                                     size: 14
                                     },
-                                    callback:(e)=>{
+                                    callback:(e,index,ticks)=>{
+                                        console.log(ticks);
                                         console.log(e);
+                                        if (isDateWithinRange(e)){
+                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                            return time;
+                                        }
                                         // if (e instanceof Date) {
                                         //     console.log("It's a Date object!");
                                         // } else {
                                         //     console.log("It's not a Date object.");
                                         // }
+                                        return e;
                                     }
                                 }
                             },
