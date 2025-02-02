@@ -7,6 +7,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.3.1"></script>
+        <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
         <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
@@ -20,6 +23,9 @@
                     dataSet:[],
                     dateSeries:[]
                 };
+            var _currentDateRange ={
+                fDate:null,tDate:null
+            }
             function readTrendlineData(){  
                 
                // var url = "https://services3.arcgis.com/5IIttubzVsJ0uEuF/ArcGIS/rest/services/trendlines_dev_2024_1_1/FeatureServer/0/query?where=Title='Motor RPM'&objectIds=&resultType=none&outFields=*&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=true&cacheHint=false&collation=&orderByFields=Date&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=";
@@ -53,7 +59,8 @@
             }
             function onDateChange(){
                 var dateRange = getSliderRange();
-                selectedLoad(dateRange.fdate,dateRange.tdate);
+                alert(_currentDateRange.tDate)
+                selectedLoad(_currentDateRange.fDate,_currentDateRange.tDate);
             }
             function getDateString(date){
                 //const date = new Date();
@@ -591,6 +598,21 @@
                         options: {
                             responsive: true,
                             plugins: {
+                                zoom: {
+                                    pan: {
+                                        enabled: true,
+                                        mode: 'x',  // Allow panning in the x-axis
+                                    },
+                                    zoom: {
+                                        wheel: {
+                                        enabled: true, // Enable zooming with mouse wheel
+                                        },
+                                        pinch: {
+                                        enabled: true // Enable zooming with pinch gestures
+                                        },
+                                        mode: 'x',  // Allow zooming in the x-axis
+                                    }
+                                },
                                 legend: {
                                 labels: {
                                     color: 'Green', // Label text color
@@ -620,7 +642,7 @@
                                 tooltip: {
                                     callbacks: {
                                     label: function(context) {
-                                        console.log(context);
+                                       // console.log(context);
                                          var e = context.raw.x; //Date time
                                          var y = context.raw.y; //measure value
                                     // // e= e.replaceAll(",","");
@@ -658,8 +680,8 @@
                                     size: 14
                                     },
                                     callback:(e,index,ticks)=>{
-                                        console.log(ticks);
-                                        console.log(e);
+                                        //console.log(ticks);
+                                       // console.log(e);
                                         if (isDateWithinRange(e)){
                                             var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
                                             return time;
@@ -674,6 +696,7 @@
                                 }
                             },
                             x:{
+                                type: 'time',
                                 title:{
                                     display: true,
                                     text: 'Date',
@@ -850,8 +873,8 @@
                     toDate = document.getElementById('tDateSelected').value;
                 }
                 else{
-                     fromDate = new Date(fDate);
-                     toDate = new Date(tDate);
+                     fromDate = fDate;
+                     toDate = tDate;
                 }
                
                 
@@ -956,11 +979,11 @@
                 if (slider.noUiSlider) {
                     slider.noUiSlider.updateOptions({
                         connect: true,
-                        range: {
-                            min: startDate,
-                            max: endDate
-                        },
-                        start: [endDate,startDate] // Set to new start value
+                        // range: {
+                        //     min: startDate,
+                        //     max: endDate
+                        // },
+                        start: [startDate,endDate] // Set to new start value
                     });
                     return;
                 }
@@ -984,7 +1007,9 @@
                 
                 slider.noUiSlider.on("update", (values) => {
                    /// selectedLoad(values[0],values[1]);
-                    sliderValue.textContent = `Start: ${values[0]}, End: ${values[1]}`;
+                   _currentDateRange.fDate =values[0];
+                   _currentDateRange.tDate = values[1];
+                    sliderValue.textContent = `From: ${values[0]} - To: ${values[1]}`;
                 });
             }
             
@@ -1005,7 +1030,7 @@
                 
                 
                 margin: 20px auto;
-                background-color: red;
+                color: wheat;
                 border-color: red;
                 z-index: 99;
             }
@@ -1048,12 +1073,14 @@
         </style>
     </head>
     <body onload="readTrendlineData()">
-        <div class="slider-container">
-            <div id="slider"></div>
-            <div class="slider-value" id="slider-value">Start: , End: </div>
-        </div>
-        <div id="divChart">            
+        
+        <div id="divChart">   
+                 
             <div>
+                <div class="slider-container">
+                    <div id="slider"></div>
+                    <div class="slider-value" id="slider-value">Start: , End: </div>
+                </div>    
                 <canvas id="myChart" ></canvas>
             </div>
             <div id="divExcetpionList">
