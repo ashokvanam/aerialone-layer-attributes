@@ -4,6 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Trendline</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -19,6 +21,7 @@
                     dateSeries:[]
                 };
             function readTrendlineData(){  
+                
                // var url = "https://services3.arcgis.com/5IIttubzVsJ0uEuF/ArcGIS/rest/services/trendlines_dev_2024_1_1/FeatureServer/0/query?where=Title='Motor RPM'&objectIds=&resultType=none&outFields=*&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=true&cacheHint=false&collation=&orderByFields=Date&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=";
                var url = 'trendlines_dev_2024_1.csv';
                 var xhttp = new XMLHttpRequest();
@@ -49,7 +52,8 @@
                     });
             }
             function onDateChange(){
-                selectedLoad();
+                var dateRange = getSliderRange();
+                selectedLoad(dateRange.fdate,dateRange.tdate);
             }
             function getDateString(date){
                 //const date = new Date();
@@ -233,6 +237,7 @@
                         var tempDate = new Date();
                         tempDate = measuredDate;
                         fdate =  getDateString(tempDate);
+                        //initSlider(fdate,fdate);
                         document.getElementById('fDateSelected').value = fdate;
                         tempDate.setMonth(tempDate.getMonth()+ 3);
                         tdate = getDateString(tempDate);
@@ -245,6 +250,7 @@
                         var toDate = new Date(tdate);
                         document.getElementById('fDateSelected').value = fdate;
                         document.getElementById('tDateSelected').value = tdate;
+                        initSlider(fdate,tdate);
                         if (!(measuredDate >= fromDate && measuredDate <= toDate)){
                             continue;
                         }
@@ -602,8 +608,8 @@
                                     display: true, // Enable the title
                                     text: title, // The title text
                                     font: {
-                                    size: 18, // Font size
-                                    weight: 'bold' // Font weight
+                                            size: 18, // Font size
+                                            weight: 'bold' // Font weight
                                     },
                                     padding: {
                                     top: 10,
@@ -798,7 +804,9 @@
                 console.log("Selected items:", selectedValues);
             }
             function mergeDataSets(baseChartDataset,newChartDataset=null){
+                let yId = baseChartDataset.dataSet.length;
                 if (!newChartDataset){
+                    baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
                     return baseChartDataset;
                 }
                 var newMeasuredDataset = newChartDataset.dataSet[0];
@@ -810,16 +818,46 @@
                 baseChartDataset.dataSet[1].data = baseChartDataset.dataSet[1].data.concat(newDegradedDataset.data);
                 baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
 
+                
+                newMeasuredDataset.yAxisID = 'y' + yId;
                 baseChartDataset.dataSet = baseChartDataset.dataSet.concat(newMeasuredDataset);
                 return baseChartDataset;
 
             }
-            function selectedLoad(){
+            function getSliderRange() {
+                var slider = document.getElementById("slider");
+                var daterange ={
+                    fdate:null,tdate:null
+                }
+
+                if (slider.noUiSlider) {
+                    daterange.fdate = slider.noUiSlider.options.range.min;
+                    daterange.tdate = slider.noUiSlider.options.range.max;
+                  //  console.log("Current Min:", min, "Current Max:", max);
+                    return daterange;
+                } else {
+                    console.warn("Slider is not initialized yet.");
+                    return null;
+                }
+            }
+            
+            function selectedLoad(fDate,tDate){
                 readSelectedItems();
+                var fromDate;
+                var toDate
+                if (!fDate && !tDate ){
+                    fromDate = document.getElementById('fDateSelected').value;
+                    toDate = document.getElementById('tDateSelected').value;
+                }
+                else{
+                     fromDate = new Date(fDate);
+                     toDate = new Date(tDate);
+                }
+               
                 
                 if (_exceptionTypes && _exceptionTypes.length > 0){
-                    var fromDate = document.getElementById('fDateSelected').value;
-                    var toDate = document.getElementById('tDateSelected').value;
+                    var dateRange = getSliderRange();
+                    
                     _exceptionTypes.forEach((exceptionType,i,_exceptionTypes)=>{
                         chartDataSet = csvToDatasetByException(_trendlineData,_locid,exceptionType,fromDate,toDate);
                         if (i==0){
@@ -894,102 +932,127 @@
                 console.log(new Date(Date.now()).toTimeString())
                 console.log('Data Plotted');
             }
+            function initSlider(fDate,tDate){
+                const slider = document.getElementById("slider");
+                const sliderValue = document.getElementById("slider-value");
+                
+                const startDate = new Date(fDate).getTime();
+                const endDate = new Date(tDate).getTime();
+                // const startDate = new Date("2024-01-01T00:00:00").getTime();
+                // const endDate = new Date("2024-12-31T23:59:59").getTime();
+                
+                function formatDateTime(timestamp) {
+                    const date = new Date(Number(timestamp));
+                    if (isNaN(date.getTime())) return "Invalid Date";
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    
+                    return `${year}-${month}-${day} ${hours}:${minutes}`;
+                }
+                if (slider.noUiSlider) {
+                    slider.noUiSlider.updateOptions({
+                        connect: true,
+                        range: {
+                            min: startDate,
+                            max: endDate
+                        },
+                        start: [endDate,startDate] // Set to new start value
+                    });
+                    return;
+                }
+                
+                noUiSlider.create(slider, {
+                    start: [startDate,endDate],
+                    connect: true,
+                    range: {
+                        'min': startDate,
+                        'max': endDate
+                    },
+                    step: 3600000, // One hour in milliseconds
+                    format: {
+                        to: formatDateTime,
+                        from: value => {
+                            const timestamp = Date.parse(value);
+                            return isNaN(timestamp) ? startDate : timestamp;
+                        }
+                    }
+                });
+                
+                slider.noUiSlider.on("update", (values) => {
+                   /// selectedLoad(values[0],values[1]);
+                    sliderValue.textContent = `Start: ${values[0]}, End: ${values[1]}`;
+                });
+            }
             
           </script>
           <style>
             body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 10px;
-                box-sizing: border-box;
                 background-color: black;
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
-    
+
+            .slider-container {
+                width: 90%;
+                
+                
+                margin: 20px auto;
+                background-color: red;
+                border-color: red;
+                z-index: 99;
+            }
+
             #divChart {
                 display: flex;
-                flex-direction: column;
-                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                width: 90%;
+                max-width: 1200px;
+                margin: auto;
             }
-    
-            #divChart > div {
-                flex: 1;
-            }
-    
+
             canvas {
-                width: 100%;
-                max-width: 600px; /* Set a maximum width for the chart */
-                height: auto; /* Maintain aspect ratio */
-                border: 1px solid #ddd; /* Optional for debugging */
+                width: 100% !important;
+                max-width: 800px;
+                height: auto !important;
             }
-    
+
             #divExcetpionList {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
+                margin-top: 20px;
+                width: 100%;
+                max-width: 400px;
+                text-align: center;
             }
-    
+
             #divDateControls {
                 display: flex;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
                 gap: 10px;
+                margin-bottom: 10px;
             }
-    
-            label {
-                flex: 1 1 100%; /* Labels take full width */
-                font-size: 0.9rem;
-            }
-    
-            input[type="date"], select, button {
-                flex: 1 1 calc(50% - 10px); /* Two items per row on small screens */
-                padding: 10px;
-                font-size: 1rem;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                box-sizing: border-box;
-            }
-    
+
             select {
-                height: auto;
-                min-height: 150px;
-            }
-    
-            button {
-                background-color: #007bff;
-                color: white;
-                cursor: pointer;
-                border: none;
-                flex: 1 1 100%; /* Full width for button */
-            }
-    
-            button:hover {
-                background-color: #0056b3;
-            }
-    
-            @media (min-width: 768px) {
-                #divChart {
-                    flex-direction: row;
-                    align-items: flex-start;
-                }
-    
-                #divChart > div:first-child {
-                    flex: 3;
-                }
-    
-                #divExcetpionList {
-                    flex: 1;
-                    max-width: 300px;
-                }
-    
-                #divDateControls input[type="date"], 
-                #divDateControls select, 
-                #divDateControls button {
-                    flex: 1 1 100%; /* Full width for desktop inputs */
-                }
+                width: 100%;
+                height: 120px;
             }
         </style>
     </head>
     <body onload="readTrendlineData()">
-        <div id="divChart">
+        <div class="slider-container">
+            <div id="slider"></div>
+            <div class="slider-value" id="slider-value">Start: , End: </div>
+        </div>
+        <div id="divChart">            
             <div>
                 <canvas id="myChart" ></canvas>
             </div>
@@ -1005,22 +1068,8 @@
                     <!-- Options will be dynamically populated -->
                 </select>
             </div>
-        </div>
-    
-        <!-- <script>
-            function readTrendlineData() {
-                // Placeholder function to prevent errors
-                console.log("Trendline data loaded");
-            }
-    
-            function onDateChange() {
-                alert("Date range changed");
-            }
-    
-            function onLoad() {
-                alert("Exception type changed");
-            }
-        </script> -->
+        </div>   
+
     </body>
   
       
