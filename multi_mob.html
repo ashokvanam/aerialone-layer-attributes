@@ -59,7 +59,7 @@
             }
             function onDateChange(){
                 var dateRange = getSliderRange();
-                alert(_currentDateRange.tDate)
+                
                 selectedLoad(_currentDateRange.fDate,_currentDateRange.tDate);
             }
             function getDateString(date){
@@ -995,21 +995,24 @@
                         'min': startDate,
                         'max': endDate
                     },
-                    step: 3600000, // One hour in milliseconds
-                    format: {
-                        to: formatDateTime,
-                        from: value => {
-                            const timestamp = Date.parse(value);
-                            return isNaN(timestamp) ? startDate : timestamp;
-                        }
-                    }
+                    step: 3600, // One hour in milliseconds
+                    // format: {
+                    //     to: formatDateTime,
+                       
+                    //     from: value => {
+                    //         const timestamp = Date.parse(value);
+                    //         return isNaN(timestamp) ? startDate : timestamp;
+                    //     }
+                    // }
                 });
                 
                 slider.noUiSlider.on("update", (values) => {
+                    var from = formatDateTime(values[0]);
+                    var to = formatDateTime(values[1]);
                    /// selectedLoad(values[0],values[1]);
-                   _currentDateRange.fDate =values[0];
-                   _currentDateRange.tDate = values[1];
-                    sliderValue.textContent = `From: ${values[0]} - To: ${values[1]}`;
+                   _currentDateRange.fDate =from;
+                   _currentDateRange.tDate = to;
+                    sliderValue.textContent = `Range: ${from} - ${to}`;
                 });
             }
             
