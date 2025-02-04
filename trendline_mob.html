@@ -4,7 +4,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Trendline</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.3.1"></script>
+        <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
         <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
@@ -18,7 +23,14 @@
                     dataSet:[],
                     dateSeries:[]
                 };
+            var _currentDateRange ={
+                fDate:null,tDate:null
+            }
+            var _dataDateRange = {
+                fDate:null,tDate:null
+            };
             function readTrendlineData(){  
+                
                // var url = "https://services3.arcgis.com/5IIttubzVsJ0uEuF/ArcGIS/rest/services/trendlines_dev_2024_1_1/FeatureServer/0/query?where=Title='Motor RPM'&objectIds=&resultType=none&outFields=*&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=true&cacheHint=false&collation=&orderByFields=Date&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=";
                var url = 'trendlines_dev_2024_1.csv';
                 var xhttp = new XMLHttpRequest();
@@ -40,7 +52,7 @@
                         complete: function (results) {
                             console.log(results.data); // Parsed data
                             _trendlineData = results.data;
-                            onLoad(results.data);
+                            onLoad();
                             //document.getElementById("output").textContent = JSON.stringify(results.data, null, 2);
                         },
                         error: function (error) {
@@ -49,7 +61,7 @@
                     });
             }
             function onDateChange(){
-                selectedLoad();
+                selectedLoad(_currentDateRange.fDate,_currentDateRange.tDate);
             }
             function getDateString(date){
                 //const date = new Date();
@@ -80,111 +92,7 @@
                 items.appendChild(item);
                 //_exceptionTypes.push(exceptionType);
             }
-            function csvToDatasetOfExcetpions(csvData,locid,exceptionTypes,fdate='',tdate=''){                
-                var t_exectpionType = '';
-                var dateSeries = [];
-                var m_measureDataset = [];
-                var measureDataset = {
-                        label:"Measurement",
-                        data: [], borderWidth:1,borderColor:'#00ff00'
-                    };
-                var degradedDataset = {
-                        label:"Degraded",
-                        data: [], borderWidth:1,borderColor:'#ff0000'
-                    };
-                var threatenedDataset = {
-                    label:"Threatened",
-                    data: [], borderWidth:1,borderColor:'#ffff00'
-                };
-
-                for (var i in csvData){                    
-                    var each = csvData[i];
-                    if (each.Measurement == 0){
-                        continue;
-                    }
-                    if (locid && each.LOC_ID != locid){
-                        continue;
-                    }
-                    if (exceptionTypes && !exceptionTypes.includes(each.Title)){
-                        continue;
-                    }
-                    
-                    
-
-                    const measuredDate = new Date(each.Date);
-                    if (fdate =='' && tdate ==''){
-                        var tempDate = new Date();
-                        tempDate = measuredDate;
-                        fdate =  getDateString(tempDate);
-                        document.getElementById('fDateSelected').value = fdate;
-                        tempDate.setMonth(tempDate.getMonth()+ 3);
-                        tdate = getDateString(tempDate);
-
-                        document.getElementById('tDateSelected').value = tdate;
-                        
-                    }
-                    if (fdate !='' && tdate !=''){
-                        var fromDate = new Date(fdate);
-                        var toDate = new Date(tdate);
-                        if (!(measuredDate >= fromDate && measuredDate <= toDate)){
-                            continue;
-                        }
-                    }
-                    if (t_exectpionType != each.Title){
-                        if (measureDataset.data.length > 0){
-                            m_measureDataset.push(measureDataset);
-                        }
-                        
-                        t_exectpionType = each.Title;
-                        measureDataset.data =[]; 
-                        measureDataset.label = each.Title;          
-                        measureDataset.borderColor = getRandomHexColor();
-                    }                    
-                    
-                    var measureValue = each.Measurement;
-                    if (each.Title == 'Event Time'){
-                         var timeString = each.Measurement;
-                         var dateString = "23-DEC-2024";
-                         var date =  (timeString, "HH:mm:ss", new Date());
-                         measureDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //measureDataset.data.push(each.Measurement);
-
-                         timeString = each.Yellow;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         threatenedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //threatenedDataset.data.push(each.Yellow);
-
-                         timeString = each.Red;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         degradedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //degradedDataset.data.push(each.Red);
-
-
-                    }
-                    else {
-                        measureDataset.label = each.Title;
-                        measureDataset.data.push(measureValue);
-                        degradedDataset.data.push(each.Red);
-                        threatenedDataset.data.push(each.Yellow);
-                    }
-                    
-                    
-                   // const utcDate = new Date(each.Date); // UTC time
-                   // const localDate = new Date(utcDate.toDateString); // Converts to local time
-                    dateSeries.push(each.Date);
-                   
-                }
-                if (m_measureDataset.length==0){
-                    m_measureDataset.push(measureDataset);
-                }
-                
-                var chartDataset ={
-                    dateSeries: dateSeries,
-                    dataSet:m_measureDataset.concat([degradedDataset,threatenedDataset]),
-                    exceptionType:'..'
-                }
-                return chartDataset;
-            }
+            
             function csvToDatasetByException(csvData,locid,exceptionType,fdate='',tdate=''){
                 var t_exectpionType = '';
                 var t_itemType = '';
@@ -233,18 +141,20 @@
                         var tempDate = new Date();
                         tempDate = measuredDate;
                         fdate =  getDateString(tempDate);
-                        document.getElementById('fDateSelected').value = fdate;
+                        //initSlider(fdate,fdate);
+                        //document.getElementById('fDateSelected').value = fdate;
                         tempDate.setMonth(tempDate.getMonth()+ 3);
                         tdate = getDateString(tempDate);
 
-                        document.getElementById('tDateSelected').value = tdate;
+                       // document.getElementById('tDateSelected').value = tdate;
                         
                     }
                     if (fdate !='' && tdate !=''){
                         var fromDate = new Date(fdate);
                         var toDate = new Date(tdate);
-                        document.getElementById('fDateSelected').value = fdate;
-                        document.getElementById('tDateSelected').value = tdate;
+                        //document.getElementById('fDateSelected').value = fdate;
+                       // document.getElementById('tDateSelected').value = tdate;
+                        initSlider(fdate,tdate);
                         if (!(measuredDate >= fromDate && measuredDate <= toDate)){
                             continue;
                         }
@@ -280,7 +190,8 @@
                     }
                     if (measureDataset.data.length>10000){
                         tdate = getDateString(new Date(each.Date));
-                        document.getElementById('tDateSelected').value = tdate;
+                        initSlider(fdate,tdate);
+                        //document.getElementById('tDateSelected').value = tdate;
                         break;
                        
                     }
@@ -298,17 +209,35 @@
                 }
                 return chartDataset;
             }
+            
             function readAllExceptionTypes(csvData,locid){
                 let counter=0;
                 var t_exectpionType = '';
+                var t_dateRange = {
+                    fDate:null, tDate:null
+                }
                 for (var i in csvData){
                     var each = csvData[i];
+                    
                     if (each.Measurement == 0){
                         continue;
                     }
                     if (locid && each.LOC_ID != locid){
                         continue;
                     }
+                    if (!t_dateRange.fDate){
+                        t_dateRange.fDate = each.Date;
+                        t_dateRange.tDate = each.Date;
+                    }
+                    else{
+                        if (new Date(each.Date) < new Date(t_dateRange.fDate) ){
+                            t_dateRange.fDate = each.Date;
+                        }
+                        if (new Date(each.Date) > new Date(t_dateRange.tDate) ){
+                            t_dateRange.tDate = each.Date;
+                        }
+                    }
+                    
                     if (t_exectpionType != each.Title){
                         t_exectpionType = each.Title;    
                         listExceptionType(each.Title);
@@ -318,117 +247,9 @@
                         counter++;
                     }
                 }
+                _dataDateRange = t_dateRange;
             }
-            function csvToDataset(csvData,locid,fdate='',tdate=''){
-                var t_exectpionType = '';
-                var dateSeries = [];
-                let counter = 0;
-                var measureDataset = {
-                        label:"Measurement",
-                        data: [], borderWidth:1,borderColor:'#00ff00'
-                    };
-                var degradedDataset = {
-                        label:"Degraded",
-                        data: [], borderWidth:1,borderColor:'#ff0000'
-                    };
-                var threatenedDataset = {
-                    label:"Threatened",
-                    data: [], borderWidth:1,borderColor:'#ffff00'
-                };
-              
-                for (var i in csvData){
-
-                    var each = csvData[i];
-                    if (each.Measurement == 0){
-                        continue;
-                    }
-                    if (locid && each.LOC_ID != locid){
-                        continue;
-                    }
-                    // if (exceptionType && each.Title != exceptionType){
-                    //     continue;
-                    // }
-                    const measuredDate = new Date(each.Date);
-                    
-                    // if (!t_exectpionType){
-                    //     t_exectpionType = each.Title;
-                    //     addExceptionType(each.Title);
-                    // }
-                    
-                    if (t_exectpionType != each.Title){
-                        t_exectpionType = each.Title;
-                        
-                        listExceptionType(each.Title);
-                        counter++;                        
-                        
-                        if (each.Title == 'Event Time'){
-                            continue;
-                        }
-                        if (counter>1){
-                            continue;
-                        }
-                        measureDataset.label = each.Title
-                        
-                    }
-                    if (fdate =='' && tdate ==''){
-                        var tempDate = new Date();
-                        tempDate = measuredDate;
-                        fdate =  getDateString(tempDate);
-                        document.getElementById('fDateSelected').value = fdate;
-                        tempDate.setMonth(tempDate.getMonth()+ 3);
-                        tdate = getDateString(tempDate);
-                        document.getElementById('tDateSelected').value = tdate;
-                        
-                    }
-                    if (fdate !='' && tdate !=''){
-                        var fromDate = new Date(fdate);
-                        var toDate = new Date(tdate);
-                        if (!(measuredDate >= fromDate && measuredDate <= toDate)){
-                            continue;
-                        }
-                    }
-                    var measureValue = each.Measurement;
-                    if (t_exectpionType == 'Event Time'){
-                         var timeString = each.Measurement;
-                         var dateString = "23-DEC-2024";
-                         var date =  (timeString, "HH:mm:ss", new Date());
-                         measureDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //measureDataset.data.push(each.Measurement);
-
-                         timeString = each.Yellow;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         threatenedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //threatenedDataset.data.push(each.Yellow);
-
-                         timeString = each.Red;
-                         date =  (timeString, "HH:mm:ss", new Date());
-                         degradedDataset.data.push(Date.parse(dateString + " " + timeString));
-                         //degradedDataset.data.push(each.Red);
-
-
-                    }
-                    else {
-                        measureDataset.data.push(measureValue);
-                        degradedDataset.data.push(each.Red);
-                        threatenedDataset.data.push(each.Yellow);
-                    }
-                    
-                    
-                   // const utcDate = new Date(each.Date); // UTC time
-                   // const localDate = new Date(utcDate.toDateString); // Converts to local time
-                    dateSeries.push(each.Date);
-                    if (dateSeries.length > 10000){
-                        break;
-                    }
-                   
-                }
-                var chartDataset ={
-                    dateSeries: dateSeries,
-                    dataSet:[measureDataset,degradedDataset,threatenedDataset],
-                    exceptionType:measureDataset.label
-                }
-                return chartDataset;
-            }
+           
             function isDateWithinRange(in_date){
                 let fDate = '01-JAN-1999'
                 let tDate = '01-JAN-2001';
@@ -585,6 +406,21 @@
                         options: {
                             responsive: true,
                             plugins: {
+                                zoom: {
+                                    pan: {
+                                        enabled: true,
+                                        mode: 'x',  // Allow panning in the x-axis
+                                    },
+                                    zoom: {
+                                        wheel: {
+                                        enabled: true, // Enable zooming with mouse wheel
+                                        },
+                                        pinch: {
+                                        enabled: true // Enable zooming with pinch gestures
+                                        },
+                                        mode: 'x',  // Allow zooming in the x-axis
+                                    }
+                                },
                                 legend: {
                                 labels: {
                                     color: 'Green', // Label text color
@@ -602,8 +438,8 @@
                                     display: true, // Enable the title
                                     text: title, // The title text
                                     font: {
-                                    size: 18, // Font size
-                                    weight: 'bold' // Font weight
+                                            size: 18, // Font size
+                                            weight: 'bold' // Font weight
                                     },
                                     padding: {
                                     top: 10,
@@ -614,7 +450,7 @@
                                 tooltip: {
                                     callbacks: {
                                     label: function(context) {
-                                        console.log(context);
+                                       // console.log(context);
                                          var e = context.raw.x; //Date time
                                          var y = context.raw.y; //measure value
                                     // // e= e.replaceAll(",","");
@@ -652,8 +488,8 @@
                                     size: 14
                                     },
                                     callback:(e,index,ticks)=>{
-                                        console.log(ticks);
-                                        console.log(e);
+                                        //console.log(ticks);
+                                       // console.log(e);
                                         if (isDateWithinRange(e)){
                                             var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
                                             return time;
@@ -668,6 +504,7 @@
                                 }
                             },
                             x:{
+                                type: 'time',
                                 title:{
                                     display: true,
                                     text: 'Date',
@@ -786,19 +623,30 @@
             }
             function readSelectedItems() {
                 _exceptionTypes= [];
+                var firstItem=null;
                 const select = document.getElementById('selExceptionTypes');
+                const allItems = Array.from(select.options).map(option => option.value);
                 const selectedValues = Array.from(select.options)
                                             .filter(option => option.selected)
                                             .map(option => option.value);
-                selectedValues.forEach((item,i,selectedValues)=>{
+                selectedValues.forEach((item,i,selectedValues)=>{                    
+                    if (i==0){
+                        firstItem = item;
+                    }
                     if (!_exceptionTypes.includes(item)){
                         _exceptionTypes.push(item);
                     }
                 })
+                if (selectedValues.length == 0 && _exceptionTypes.length == 0){
+                    _exceptionTypes.push(allItems[0]);
+                }
+                
                 console.log("Selected items:", selectedValues);
             }
             function mergeDataSets(baseChartDataset,newChartDataset=null){
+                let yId = baseChartDataset.dataSet.length;
                 if (!newChartDataset){
+                    baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
                     return baseChartDataset;
                 }
                 var newMeasuredDataset = newChartDataset.dataSet[0];
@@ -810,16 +658,47 @@
                 baseChartDataset.dataSet[1].data = baseChartDataset.dataSet[1].data.concat(newDegradedDataset.data);
                 baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
 
+                
+                newMeasuredDataset.yAxisID = 'y' + yId;
                 baseChartDataset.dataSet = baseChartDataset.dataSet.concat(newMeasuredDataset);
                 return baseChartDataset;
 
             }
-            function selectedLoad(){
+            function getSliderRange() {
+                var slider = document.getElementById("slider");
+                var daterange ={
+                    fdate:null,tdate:null
+                }
+
+                if (slider.noUiSlider) {
+                    daterange.fdate = slider.noUiSlider.options.range.min;
+                    daterange.tdate = slider.noUiSlider.options.range.max;
+                  //  console.log("Current Min:", min, "Current Max:", max);
+                    return daterange;
+                } else {
+                    console.warn("Slider is not initialized yet.");
+                    return null;
+                }
+            }
+            
+            function selectedLoad(fDate,tDate){
                 readSelectedItems();
+                var fromDate;
+                var toDate;
+                
+                if (!fDate && !tDate ){
+                    fromDate = _currentDateRange.fDate;
+                    toDate = _currentDateRange.tDate;
+                }
+                else{
+                     fromDate = fDate;
+                     toDate = tDate;
+                }
+               
                 
                 if (_exceptionTypes && _exceptionTypes.length > 0){
-                    var fromDate = document.getElementById('fDateSelected').value;
-                    var toDate = document.getElementById('tDateSelected').value;
+                   // var dateRange = getSliderRange();
+                    
                     _exceptionTypes.forEach((exceptionType,i,_exceptionTypes)=>{
                         chartDataSet = csvToDatasetByException(_trendlineData,_locid,exceptionType,fromDate,toDate);
                         if (i==0){
@@ -835,190 +714,256 @@
                     InitScatterChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
                 }
             }
-            function onLoad(trendlineData){
-                if (!trendlineData && _trendlineData){
-                    trendlineData = _trendlineData;
-                }
-                readSelectedItems();
+            function onLoad(){
+                // if (!trendlineData && _trendlineData){
+                //     trendlineData = _trendlineData;
+                // }
+                //readSelectedItems();
                 const params = new URLSearchParams(window.location.search);
-                _locid = params.get('locid')?params.get('locid'):'';                
-                var fromDate = document.getElementById('fDateSelected').value;
-                var toDate = document.getElementById('tDateSelected').value;
-                //var exceptionType = document.getElementById('selExceptionTypes').value;
-
-                // if (!exceptionType)
-                //     {
-                //     alert('No Exception type');
-                //     return;   
-                //     }
-                //var chartDataSet = featuresToDataSet(trendlineData.features);
+                _locid = params.get('locid')?params.get('locid'):'';  
                 var chartDataset = {
                     exceptionType:'',
                     dataSet:[],
                     dateSeries:[]
                 };
-                const ctx = document.getElementById('myChart');
-                // if (_exceptionTypes.length> 0){
-                //     const chartDataSet = csvToDatasetOfExcetpions(trendlineData,locid,_exceptionTypes,fromDate,toDate);
-                //     InitChart(ctx,'line',chartDataSet.dateSeries,chartDataSet.dataSet,chartDataset.exceptionType);
-                //     return;
-                // } 
-                // else{
-                //     chartDataSet = csvToDataset(trendlineData,locid,fromDate,toDate);
-                //     chartDataSet = csvToDatasetByException(trendlineData,locid,chartDataSet.exceptionType,fromDate,toDate);
-                // }
                 
                 console.log(new Date(Date.now()).toTimeString())
                 console.log('Data Loaded');
-                readAllExceptionTypes(trendlineData,_locid);
+                readAllExceptionTypes(_trendlineData,_locid);
+                var fromDate = _dataDateRange.fDate;
+                var toDate = _dataDateRange.tDate;
+
                 chartDataSet = csvToDatasetByException(_trendlineData,_locid,_exceptionTypes[0],fromDate,toDate);
                 
                 //chartDataSet = csvToDataset(trendlineData,_locid,fromDate,toDate);
                 console.log(new Date(Date.now()).toTimeString())
                 console.log('Data Selected');
-                // chartDataSet = csvToDatasetByException(trendlineData,locid,chartDataSet.exceptionType,fromDate,toDate);
-                // if (!exceptionType){
-                //     exceptionType = chartDataSet.exceptionType;
-                // }
-              
-                
 
-                // if (chartDataSet.exceptionType == 'Event Time'){
-                //     InitChartEventType(ctx,'line',chartDataSet.dateSeries,chartDataSet.dataSet,chartDataSet.exceptionType);
-               
-                // }
-                // else{
-                //     InitChart(ctx,'line',chartDataSet.dateSeries,chartDataSet.dataSet,chartDataSet.exceptionType);
-                // }
+                const ctx = document.getElementById('myChart');
                 InitScatterChart(ctx,'scatter',chartDataSet.dateSeries.sort((a, b) => a - b),chartDataSet.dataSet,_exceptionTypes.join(','));
                 console.log(new Date(Date.now()).toTimeString())
                 console.log('Data Plotted');
             }
+            function initSlider(fDate,tDate){
+                const slider = document.getElementById("slider");
+                const sliderValue = document.getElementById("slider-value");
+                
+                const startDate = new Date(fDate).getTime();
+                const endDate = new Date(tDate).getTime();
+                // const startDate = new Date("2024-01-01T00:00:00").getTime();
+                // const endDate = new Date("2024-12-31T23:59:59").getTime();
+                
+                function formatDateTime(timestamp) {
+                    const date = new Date(Number(timestamp));
+                    if (isNaN(date.getTime())) return "Invalid Date";
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    
+                    return `${year}-${month}-${day} ${hours}:${minutes}`;
+                }
+                if (slider.noUiSlider) {
+                    slider.noUiSlider.updateOptions({
+                        connect: true,
+                        // range: {
+                        //     min: startDate,
+                        //     max: endDate
+                        // },
+                        start: [startDate,endDate] // Set to new start value
+                    });
+                    return;
+                }
+                
+                noUiSlider.create(slider, {
+                    start: [startDate,endDate],
+                    connect: true,
+                    range: {
+                        'min': startDate,
+                        'max': endDate
+                    },
+                    step: 3600, // One hour in milliseconds
+                    // format: {
+                    //     to: formatDateTime,
+                       
+                    //     from: value => {
+                    //         const timestamp = Date.parse(value);
+                    //         return isNaN(timestamp) ? startDate : timestamp;
+                    //     }
+                    // }
+                });
+                
+                slider.noUiSlider.on("update", (values) => {
+                    var from = formatDateTime(values[0]);
+                    var to = formatDateTime(values[1]);
+                   /// selectedLoad(values[0],values[1]);
+                   _currentDateRange.fDate =from;
+                   _currentDateRange.tDate = to;
+                   slidervalue1.textContent = from;
+                   slidervalue2.textContent = to;
+                   // sliderValue.textContent = `Range: ${from} - ${to}`;
+                });
+            }
             
           </script>
           <style>
-            body {
-                font-family: Arial, sans-serif;
+            * {
                 margin: 0;
-                padding: 10px;
+                padding: 0;
                 box-sizing: border-box;
-                background-color: black;
+            }
+    
+            body, html {
+                height: 100%;
+                width: 100%;
+                font-family: Arial, sans-serif;
+                background-color: #121212;  /* Dark background */
+                color: #e0e0e0;             /* Light text */
             }
     
             #divChart {
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
+                height: 100vh;
+                padding: 20px;
                 gap: 20px;
             }
     
-            #divChart > div {
-                flex: 1;
+            /* Chart container styling */
+            #divChart > div:first-child {
+                flex: 3;
+                display: flex;
+                flex-direction: column;
             }
     
             canvas {
+                flex: 1;
+                background-color: #1e1e1e; /* Dark canvas background */
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            }
+    
+            /* Slider container styling */
+            .slider-container {
+                margin-bottom: 20px;
+                background: #1e1e1e;
+                padding: 15px;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            }
+    
+            #slider {
                 width: 100%;
-                max-width: 600px; /* Set a maximum width for the chart */
-                height: auto; /* Maintain aspect ratio */
-                border: 1px solid #ddd; /* Optional for debugging */
-            }
-    
-            #divExcetpionList {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-    
-            #divDateControls {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-    
-            label {
-                flex: 1 1 100%; /* Labels take full width */
-                font-size: 0.9rem;
-            }
-    
-            input[type="date"], select, button {
-                flex: 1 1 calc(50% - 10px); /* Two items per row on small screens */
-                padding: 10px;
-                font-size: 1rem;
-                border: 1px solid #ccc;
+                height: 8px;
+                background: #333;
                 border-radius: 5px;
-                box-sizing: border-box;
+                position: relative;
             }
     
-            select {
-                height: auto;
-                min-height: 150px;
+            .slider-values {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+    
+            .slider-value1, .slider-value2 {
+                font-size: 14px;
+                color: #bbb;
             }
     
             button {
-                background-color: #007bff;
-                color: white;
-                cursor: pointer;
+                margin-top: 10px;
+                padding: 10px 20px;
                 border: none;
-                flex: 1 1 100%; /* Full width for button */
+                border-radius: 5px;
+                background-color: #007bff;
+                color: #fff;
+                cursor: pointer;
+                transition: background-color 0.3s;
             }
     
             button:hover {
                 background-color: #0056b3;
             }
     
-            @media (min-width: 768px) {
-                #divChart {
-                    flex-direction: row;
-                    align-items: flex-start;
-                }
-    
-                #divChart > div:first-child {
-                    flex: 3;
-                }
-    
-                #divExcetpionList {
-                    flex: 1;
-                    max-width: 300px;
-                }
-    
-                #divDateControls input[type="date"], 
-                #divDateControls select, 
-                #divDateControls button {
-                    flex: 1 1 100%; /* Full width for desktop inputs */
-                }
+            /* Exception list container styling */
+            #divExcetpionList {
+                flex: 1;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                display: flex;
+                flex-direction: column;
             }
+    
+            #divExcetpionList h3 {
+                margin-bottom: 10px;
+                color: #e0e0e0;
+            }
+    
+            select {
+                flex: 1;
+                width: 100%;
+                border: 1px solid #555;
+                border-radius: 5px;
+                padding: 10px;
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+                font-size: 14px;
+            }
+    
+            select option {
+                padding: 5px;
+                background-color: #2c2c2c;
+                color: #e0e0e0;
+            }
+    
+            select option:hover {
+                background-color: #007bff;
+                color: #fff;
+            }
+    
         </style>
     </head>
     <body onload="readTrendlineData()">
         <div id="divChart">
+            <!-- Left Section: Slider and Chart -->
             <div>
-                <canvas id="myChart" ></canvas>
-            </div>
-            <div id="divExcetpionList">
-                <div id="divDateControls">
-                    <label for="fDateSelected">From:</label>
-                    <input type="date" id="fDateSelected" placeholder="YYYY-MM-DD">
-                    <label for="tDateSelected">To:</label>
-                    <input type="date" id="tDateSelected" placeholder="YYYY-MM-DD">
+                <div class="slider-container">
+                    <div id="slider"></div>
+                    <div class="slider-values">
+                        <div class="slider-value1" id="slidervalue1">Start: 0</div>
+                        <div class="slider-value2" id="slidervalue2">End: 100</div>
+                    </div>
                     <button onclick="onDateChange()">Refresh</button>
                 </div>
-                <select id="selExceptionTypes" onchange="selectedLoad()"  size="5" multiple>
+                <canvas id="myChart"></canvas>
+            </div>
+    
+            <!-- Right Section: Exception List -->
+            <div id="divExcetpionList">
+                <h3>Exception Types</h3>
+                <select id="selExceptionTypes" onchange="selectedLoad()" size="10" multiple>
                     <!-- Options will be dynamically populated -->
                 </select>
             </div>
         </div>
     
+        <!-- Sample Script for Functionality (Assuming you have libraries linked) -->
         <!-- <script>
             function readTrendlineData() {
-                // Placeholder function to prevent errors
-                console.log("Trendline data loaded");
+                console.log("Trendline data loaded.");
             }
     
             function onDateChange() {
-                alert("Date range changed");
+                console.log("Date range changed.");
             }
     
-            function onLoad() {
-                alert("Exception type changed");
+            function selectedLoad() {
+                console.log("Exception type selected.");
             }
         </script> -->
     </body>
