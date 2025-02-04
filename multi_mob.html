@@ -1012,11 +1012,41 @@
                    /// selectedLoad(values[0],values[1]);
                    _currentDateRange.fDate =from;
                    _currentDateRange.tDate = to;
-                    sliderValue.textContent = `Range: ${from} - ${to}`;
+                   slidervalue1.textContent = from;
+                   slidervalue2.textContent = to;
+                   // sliderValue.textContent = `Range: ${from} - ${to}`;
                 });
             }
             
           </script>
+          <style>
+            .slider-container {
+                width: 100%;               /* Adjust the width as needed */
+                margin: 50px auto;          /* Center the container horizontally */
+                }
+
+                #slider {
+                width: 100%;                /* Full width of the container */
+                height: 10px;                /* Adjust the slider height */
+                background: #ddd;           /* Placeholder background */
+                position: relative;
+                margin-bottom: 10px; 
+                  /* Space between slider and values */
+                }
+
+                .slider-values {
+                    display: flex;
+                    justify-content: space-between;  /* Align values to left and right edges */
+                    margin-top: 25px;                /* Move the values slightly down */
+                    }
+
+                    .slider-value1, .slider-value2 {
+                    font-size: 14px;
+                    color: green;
+                    }
+
+          </style>
+          
           <style>
             body {
                 background-color: black;
@@ -1028,7 +1058,7 @@
                 align-items: center;
             }
 
-            .slider-container {
+            /* .slider-container {
                 width: 90%;
                 
                 
@@ -1036,8 +1066,13 @@
                 color: wheat;
                 border-color: red;
                 z-index: 99;
+            } */
+            /* .slider-value1{
+                display: flex; justify-content: flex-start;
             }
-
+            .slider-value1{
+                display: flex; justify-content: flex-end;
+            } */
             #divChart {
                 display: flex;
                 flex-wrap: wrap;
@@ -1081,9 +1116,16 @@
                  
             <div>
                 <div class="slider-container">
+                    <!-- Slider -->
                     <div id="slider"></div>
-                    <div class="slider-value" id="slider-value">Start: , End: </div>
-                </div>    
+                  
+                    <!-- Values aligned to the edges -->
+                    <div class="slider-values">
+                      <div class="slider-value1" id="slidervalue1">Start: 0</div>
+                      <div class="slider-value2" id="slidervalue2">End: 100</div>
+                    </div>
+                  </div>
+                   
                 <canvas id="myChart" ></canvas>
             </div>
             <div id="divExcetpionList">
