@@ -452,7 +452,7 @@
                                     top: 10,
                                     bottom: 20
                                     },
-                                    color: 'rgb(75, 192, 192)' // Text color
+                                    color: '#00ffc5' // Text color
                                 },
                                 tooltip: {
                                     callbacks: {
@@ -654,7 +654,7 @@
             function mergeDataSets(baseChartDataset,newChartDataset=null){
                 let yId = baseChartDataset.dataSet.length;
                 if (!newChartDataset){
-                    baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
+               //     baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
                     return baseChartDataset;
                 }
                 var newMeasuredDataset = newChartDataset.dataSet[0];
@@ -667,7 +667,7 @@
                 baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
 
                 
-                newMeasuredDataset.yAxisID = 'y' + yId;
+                //newMeasuredDataset.yAxisID = 'y' + yId;
                 baseChartDataset.dataSet = baseChartDataset.dataSet.concat(newMeasuredDataset);
                 return baseChartDataset;
 
