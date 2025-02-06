@@ -854,7 +854,7 @@
             }
     
             canvas {
-                flex: 1;
+                
                 background-color: #1e1e1e; /* Dark canvas background */
                 border-radius: 10px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
@@ -867,6 +867,7 @@
                 padding: 15px;
                 border-radius: 10px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                
             }
     
             #slider {
@@ -875,6 +876,7 @@
                 background: #333;
                 border-radius: 5px;
                 position: relative;
+                
                 
             }
     
@@ -910,7 +912,7 @@
     
             /* Exception list container styling */
             #divExcetpionList {                
-                flex: 1;
+                
                 background: #1e1e1e;
                 padding: 20px;
                 border-radius: 10px;
@@ -958,7 +960,7 @@
                         <div class="slider-value1" id="slidervalue1">Start: 0</div>
                         <div class="slider-value2" id="slidervalue2">End: 100</div>
                     </div>
-                    <button onclick="onDateChange()">Refresh</button>
+                    
                     
                 </div>
                 <canvas id="myChart"></canvas>
@@ -966,6 +968,8 @@
     
             <!-- Right Section: Exception List -->
             <div id="divExcetpionList">
+                <button onclick="onDateChange()">Refresh</button>
+                <br>
                 <label for="selDataLimit">Max Records to Display</label>
                 <select id="selDataLimit" style="height: fit-content;">
                     <option value="2000">2000</option>
@@ -978,22 +982,8 @@
                     <!-- Options will be dynamically populated -->
                 </select>
             </div>
-        </div>
-    
-        <!-- Sample Script for Functionality (Assuming you have libraries linked) -->
-        <!-- <script>
-            function readTrendlineData() {
-                console.log("Trendline data loaded.");
-            }
-    
-            function onDateChange() {
-                console.log("Date range changed.");
-            }
-    
-            function selectedLoad() {
-                console.log("Exception type selected.");
-            }
-        </script> -->
+        </div>   
+      
     </body>
   
       
