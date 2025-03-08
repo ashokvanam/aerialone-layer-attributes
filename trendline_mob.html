@@ -103,6 +103,7 @@
                 var t_exectpionType = '';
                 var t_itemType = '';
                 var dateSeries = [];
+                var max_tDate = '';
                 var measuredValueColour = getRandomHexColor()
                 var measureDataset = {
                         label: exceptionType,
@@ -161,7 +162,12 @@
                         //document.getElementById('fDateSelected').value = fdate;
                        // document.getElementById('tDateSelected').value = tdate;
                         initSlider(fdate,tdate);
-                        if (!(measuredDate >= fromDate && measuredDate <= toDate)){
+                        if (max_tDate){
+                            if (!(measuredDate >= fromDate && measuredDate <= max_tDate)){
+                                continue;
+                            }
+                        }
+                        else if (!(measuredDate >= fromDate && measuredDate <= toDate)){
                             continue;
                         }
                     }
@@ -195,11 +201,12 @@
                         threatenedDataset.data.push({x:new Date(each.Date),y:each.Yellow});
                     }
                     
-                    if (measureDataset.data.length>dataLimit){
+                    if (!max_tDate && measureDataset.data.length>dataLimit){
                         tdate = getDateString(new Date(each.Date));
+                        max_tDate = new Date(tdate);
                         initSlider(fdate,tdate);
                         //document.getElementById('tDateSelected').value = tdate;
-                        break;
+                        //break;
                        
                     }
                     
@@ -209,6 +216,7 @@
                     //dateSeries.push(each.Date);
                    
                 }
+
                 var chartDataset ={
                     dateSeries: dateSeries,
                     dataSet:[measureDataset,degradedDataset,threatenedDataset],
@@ -702,7 +710,6 @@
                      fromDate = fDate;
                      toDate = tDate;
                 }
-               
                 
                 if (_exceptionTypes && _exceptionTypes.length > 0){
                    // var dateRange = getSliderRange();
@@ -724,6 +731,7 @@
                         console.log('Merged Selected Exceptions');
                     });
                     const ctx = document.getElementById('myChart');
+                    
                     InitScatterChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
                     console.log(new Date(Date.now()).toTimeString())
                     console.log('displayed on Chart');

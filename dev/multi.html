@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body{
+            background-color: black;
+            color: greenyellow;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                    {
+                        label: 'Temperature (°C)',
+                        data: [10, 15, 12, 18, 20, 25],
+                        borderColor: 'red',
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: 'Humidity (%)',
+                        data: [30, 40, 35, 50, 55, 60],
+                        borderColor: 'blue',
+                        yAxisID: 'y2'
+                    },
+                    {
+                        label: 'Speed (kph)',
+                        data: [101, 102, 103, 50, 105, 110, 50],
+                        borderColor: 'green',
+                        yAxisID: 'y3'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y1: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        }
+                    },
+                    y2: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Humidity (%)'
+                        },
+                        grid: {
+                            drawOnChartArea: false  // Prevents grid lines from overlapping
+                        }
+                    },
+                    y3: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Speed (kph)'
+                        },
+                        grid: {
+                            drawOnChartArea: false  // Prevents grid lines from overlapping
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

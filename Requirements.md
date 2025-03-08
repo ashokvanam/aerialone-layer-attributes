@@ -1,5 +1,0 @@
-- TRendline is combination of points - no lines
-- Relative Relationships
-- Additional Y Axis with own scale
-- Time Slider 
-- Fill the blank screen
