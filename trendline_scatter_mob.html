@@ -117,6 +117,7 @@
                         borderColor: measuredValueColour,
                         backgroundColor: measuredValueColour,
                         showLine: true, // Connect points with a line
+                        scales:[]
                     };
                 var degradedDataset = {
                         label:"Degraded",
@@ -219,7 +220,8 @@
 
                 var chartDataset ={
                     dateSeries: dateSeries,
-                    dataSet:[measureDataset,degradedDataset,threatenedDataset],
+                    dataSet:[measureDataset],
+                    //dataSet:[measureDataset,degradedDataset,threatenedDataset],
                     exceptionType:exceptionType
                 }
                 return chartDataset;
@@ -409,7 +411,7 @@
                         }
                     });
             }
-            function InitScatterChart(chartCtrl,chartType,labels, datasets,title){
+            function InitScatterChart(chartCtrl,chartType,labels, datasets,title,scales){
                 if (_chart) {
                     _chart.destroy();
                     }
@@ -486,39 +488,39 @@
                             },
                            
                             scales: {
-                            y:{
-                                title:{
-                                    display: true,
-                                    beginAtZero:true,
-                                    text: 'Measurement',
-                                    color: 'green',
-                                    font: {
-                                    size: 16,
-                                    weight: 'bold',
-                                    family: 'Verdana'
-                                    }
-                                },
-                                ticks:{
-                                    color: 'green',
-                                    font: {
-                                    size: 14
-                                    },
-                                    callback:(e,index,ticks)=>{
-                                        //console.log(ticks);
-                                       // console.log(e);
-                                        if (isDateWithinRange(e)){
-                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return time;
-                                        }
-                                        // if (e instanceof Date) {
-                                        //     console.log("It's a Date object!");
-                                        // } else {
-                                        //     console.log("It's not a Date object.");
-                                        // }
-                                        return e;
-                                    }
-                                }
-                            },
+                            // y:{
+                            //     title:{
+                            //         display: true,
+                            //         beginAtZero:true,
+                            //         text: 'Measurement',
+                            //         color: 'green',
+                            //         font: {
+                            //         size: 16,
+                            //         weight: 'bold',
+                            //         family: 'Verdana'
+                            //         }
+                            //     },
+                            //     ticks:{
+                            //         color: 'green',
+                            //         font: {
+                            //         size: 14
+                            //         },
+                            //         callback:(e,index,ticks)=>{
+                            //             //console.log(ticks);
+                            //             console.log(e);
+                            //             if (isDateWithinRange(e)){
+                            //                 var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                            //                 return time;
+                            //             }
+                            //             // if (e instanceof Date) {
+                            //             //     console.log("It's a Date object!");
+                            //             // } else {
+                            //             //     console.log("It's not a Date object.");
+                            //             // }
+                            //             return e;
+                            //         }
+                            //     }
+                            // },
                             x:{
                                 type: 'time',
                                 title:{
@@ -547,6 +549,15 @@
                             }
                         }
                     });
+                    // Add a new scale dynamically
+                    if (scales){
+                            scales.forEach((each,i,scales)=>{
+                            _chart.options.scales[each.id] = each.scale
+                        })
+                        _chart.update();
+                    }
+                    
+                
             }
             function InitChartEventType(chartCtrl,chartType,labels, datasets,title){
                 if (_chart){
@@ -659,10 +670,58 @@
                 
                 console.log("Selected items:", selectedValues);
             }
+            function generateGraphScale(id,type,title,color){
+                var defaultScale = {
+                        id:id,
+                        scale:{
+                            title:{
+                                display: true,
+                                beginAtZero:true,
+                                text: title,
+                                color: color,
+                                font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: 'Verdana'
+                                }
+                            },
+                            ticks:{
+                                color: color,
+                                font: {
+                                size: 14
+                                },
+                                callback:(e,index,ticks)=>{
+                                    //console.log(ticks);
+                                    // console.log(e);
+                                    if (isDateWithinRange(e)){
+                                        var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                        return time;
+                                    }
+                                    // if (e instanceof Date) {
+                                    //     console.log("It's a Date object!");
+                                    // } else {
+                                    //     console.log("It's not a Date object.");
+                                    // }
+                                    return e;
+                                }
+                            }
+                        }
+                    
+                }
+                
+                return defaultScale;
+            }
             function mergeDataSets(baseChartDataset,newChartDataset=null){
                 let yId = baseChartDataset.dataSet.length;
                 if (!newChartDataset){
-               //     baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
+                    // baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
+                    // var yScale = generateGraphScale(baseChartDataset.yAxisID,'','Measurement',baseChartDataset.backgroundColor)
+                    // if (baseChartDataset.scales){
+                    //     baseChartDataset.scales.push(yScale);
+                    // }
+                    // else{
+                    //     baseChartDataset.scales= [yScale];
+                    // }
                     return baseChartDataset;
                 }
                 var newMeasuredDataset = newChartDataset.dataSet[0];
@@ -671,12 +730,22 @@
                 var newDateSeries =  newChartDataset.dateSeries;
 
                 baseChartDataset.dateSeries = baseChartDataset.dateSeries.concat(newDateSeries);
-                baseChartDataset.dataSet[1].data = baseChartDataset.dataSet[1].data.concat(newDegradedDataset.data);
-                baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
+               // baseChartDataset.dataSet[1].data = baseChartDataset.dataSet[1].data.concat(newDegradedDataset.data);
+                //baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
 
                 
-                //newMeasuredDataset.yAxisID = 'y' + yId;
+                newMeasuredDataset.yAxisID = 'y' + yId;
+                newMeasuredDataset.xAxisID = 'x' + yId;
+                var yScale = generateGraphScale(newMeasuredDataset.yAxisID,'','Measurement',newMeasuredDataset.backgroundColor)
+                if (baseChartDataset.scales){
+                    baseChartDataset.scales.push(yScale);
+                }
+                else{
+                    baseChartDataset.scales= [yScale];
+                }
+                
                 baseChartDataset.dataSet = baseChartDataset.dataSet.concat(newMeasuredDataset);
+                
                 return baseChartDataset;
 
             }
@@ -719,8 +788,8 @@
                         console.log(new Date(Date.now()).toTimeString())
                         console.log('Reading Selected Exception');
                         if (i==0){
-                            chartDataSet.dataSet[0].backgroundColor = '#00ff00';
-                            chartDataSet.dataSet[0].borderColor = '#00ff00';
+                           // chartDataSet.dataSet[0].backgroundColor = '#00ff00';
+                           // chartDataSet.dataSet[0].borderColor = '#00ff00';
                             _chartDataset =  mergeDataSets(chartDataSet);
                             
                         }
@@ -731,8 +800,8 @@
                         console.log('Merged Selected Exceptions');
                     });
                     const ctx = document.getElementById('myChart');
-                    InitScatterChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','));
-                    console.log(new Date(Date.now()).toTimeString())
+                    InitScatterChart(ctx,'scatter',_chartDataset.dateSeries.sort((a, b) => a - b),_chartDataset.dataSet,_exceptionTypes.join(','),_chartDataset.scales);
+                    console.log(new Date(Date.now()).toTimeString());
                     console.log('displayed on Chart');
                 }
             }

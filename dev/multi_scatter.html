@@ -30,19 +30,19 @@
             type: 'scatter',
             data: {
                 datasets: [
-                    // {
-                    //     label: 'Temperature (°C)',
-                    //     data: [ {     x: new Date("08-01-2024 02:00"),     "y": "11"},
-                    //     {     x: new Date("09-01-2024 02:00"),     "y": "25"},
+                    {
+                        label: 'Temperature (°C)',
+                        data: [ {     x: new Date("08-01-2024 02:00"),     "y": "11"},
+                        {     x: new Date("09-01-2024 02:00"),     "y": "25"},
 
-                    //     {     x: new Date("10-01-2024 02:00"),     "y": "1"},
-                    //     {     x: new Date("11-01-2024 02:00"),     "y": "18"},
-                    //     {     x: new Date("12-01-2024 02:00"),     "y": "16"},
-                    //     {     x: new Date("12-02-2024 02:00"),     "y": "65"},
-                    //     {     x: new Date("12-03-2024 02:00"),     "y": "75"}],
-                    //     borderColor: 'green',
-                    //     yAxisID: 'y1',showLine: true,xAxisID:'x1'
-                    // },
+                        {     x: new Date("10-01-2024 02:00"),     "y": "1"},
+                        {     x: new Date("11-01-2024 02:00"),     "y": "18"},
+                        {     x: new Date("12-01-2024 02:00"),     "y": "16"},
+                        {     x: new Date("12-02-2024 02:00"),     "y": "65"},
+                        {     x: new Date("12-03-2024 02:00"),     "y": "75"}],
+                        borderColor: 'green',
+                        yAxisID: 'y1',showLine: true,xAxisID:'x1'
+                    },
                     // {
                     //     label: 'Temp Min',
                     //     data: [ {     x: new Date("08-01-2024 02:00"),     "y": "25"},
@@ -108,19 +108,19 @@
                     //     borderColor: 'yellow',
                     //     showLine: true
                     // },
-                    // {
-                    //     label: 'Wind Speed (KPH)',
-                    //     data: [ {     x: new Date("08-02-2024 02:00"),     "y": "1000"},
-                    //     {     x: new Date("09-03-2024 02:00"),     "y": "2000"},
+                    {
+                        label: 'Wind Speed (KPH)',
+                        data: [ {     x: new Date("08-02-2024 02:00"),     "y": "1000"},
+                        {     x: new Date("09-03-2024 02:00"),     "y": "2000"},
 
-                    //     {     x: new Date("10-04-2024 02:00"),     "y": "1500"},
-                    //     {     x: new Date("11-05-2024 02:00"),     "y": "800"},
-                    //     {     x: new Date("12-06-2024 02:00"),     "y": "3000"},
-                    //     {     x: new Date("12-07-2024 02:00"),     "y": "2500"},
-                    //     {     x: new Date("12-08-2024 02:00"),     "y": "2000"}],
-                    //     borderColor: 'orange',
-                    //     yAxisID: 'y3',showLine: true,xAxisID:'x3'
-                    // },
+                        {     x: new Date("10-04-2024 02:00"),     "y": "1500"},
+                        {     x: new Date("11-05-2024 02:00"),     "y": "800"},
+                        {     x: new Date("12-06-2024 02:00"),     "y": "3000"},
+                        {     x: new Date("12-07-2024 02:00"),     "y": "2500"},
+                        {     x: new Date("12-08-2024 02:00"),     "y": "2000"}],
+                        borderColor: 'orange',
+                        yAxisID: 'y3',showLine: true,xAxisID:'x3'
+                    },
                     // {
                     //     label: 'Wind Speed Max',
                     //     data: [ {     x: new Date("08-01-2024 02:00"),     "y": "3000"},
@@ -152,29 +152,29 @@
             options: {
                 responsive: true,
                 scales: {
-                    // x1:{
-                    //             title:{
-                    //                 display: true,
-                    //                 text: 'Date',
-                    //                 color: 'green',
-                    //                 font: {
-                    //                 size: 16,
-                    //                 weight: 'bold',
-                    //                 family: 'Verdana'
-                    //                 }
-                    //             },
-                    //             ticks:{
-                    //                 color: 'green',
-                    //                 font: {
-                    //                 size: 14
-                    //                 },
-                    //                 callback:function(e){
-                    //                         //console.log('ticks:' + e)
-                    //                         var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                    //                         return  new Date(e).toDateString() + ' ' + time ;
-                    //                     },
-                    //             }
-                    //         } ,
+                    x1:{
+                                title:{
+                                    display: true,
+                                    text: 'Date',
+                                    color: 'green',
+                                    font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: 'Verdana'
+                                    }
+                                },
+                                ticks:{
+                                    color: 'green',
+                                    font: {
+                                    size: 14
+                                    },
+                                    callback:function(e){
+                                            //console.log('ticks:' + e)
+                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                            return  new Date(e).toDateString() + ' ' + time ;
+                                        },
+                                }
+                            } ,
                             x2:{
                                 title:{
                                     display: true,
@@ -199,61 +199,61 @@
                                         },
                                 }
                             } ,
-                            // x3:{
-                            //     title:{
-                            //         display: true,
-                            //         text: 'Date',
-                            //         color: 'oramge',
-                            //         font: {
-                            //         size: 16,
-                            //         weight: 'bold',
-                            //         family: 'Verdana'
-                            //         }
-                            //     },
-                            //     ticks:{
-                            //         color: 'green',
-                            //         font: {
-                            //         size: 14
-                            //         },
-                            //         callback:function(e){
-                            //                 //console.log('ticks:' + e)
-                            //                 var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                            //                 return  new Date(e).toDateString() + ' ' + time ;
-                            //             },
-                            //     }
-                            // } ,
-                    // y1: {
-                    //     type: 'linear',
-                    //     position: 'left',
-                    //     title: {
-                    //         color:'green',
-                    //         display: true,
-                    //         text: 'Temperature (°C)'
-                    //     },
-                    //     ticks:{
-                    //         color:'green'
-                    //     }
-                    //     // ticks:{
-                    //     //             color: 'green',
-                    //     //             font: {
-                    //     //             size: 14
-                    //     //             },
-                    //     //             callback:(e,index,ticks)=>{
-                    //     //                 console.log(ticks);
-                    //     //                 console.log(e);
-                    //     //                 if (isDateWithinRange(e)){
-                    //     //                     var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                    //     //                     return time;
-                    //     //                 }
-                    //     //                 // if (e instanceof Date) {
-                    //     //                 //     console.log("It's a Date object!");
-                    //     //                 // } else {
-                    //     //                 //     console.log("It's not a Date object.");
-                    //     //                 // }
-                    //     //                 return e;
-                    //     //             }
-                    //     //         }
-                    // },
+                            x3:{
+                                title:{
+                                    display: true,
+                                    text: 'Date',
+                                    color: 'orange',
+                                    font: {
+                                    size: 16,
+                                    weight: 'bold',
+                                    family: 'Verdana'
+                                    }
+                                },
+                                ticks:{
+                                    color: 'green',
+                                    font: {
+                                    size: 14
+                                    },
+                                    callback:function(e){
+                                            //console.log('ticks:' + e)
+                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                            return  new Date(e).toDateString() + ' ' + time ;
+                                        },
+                                }
+                            } ,
+                    y1: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            color:'green',
+                            display: true,
+                            text: 'Temperature (°C)'
+                        },
+                        ticks:{
+                            color:'green'
+                        }
+                        // ticks:{
+                        //             color: 'green',
+                        //             font: {
+                        //             size: 14
+                        //             },
+                        //             callback:(e,index,ticks)=>{
+                        //                 console.log(ticks);
+                        //                 console.log(e);
+                        //                 if (isDateWithinRange(e)){
+                        //                     var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                        //                     return time;
+                        //                 }
+                        //                 // if (e instanceof Date) {
+                        //                 //     console.log("It's a Date object!");
+                        //                 // } else {
+                        //                 //     console.log("It's not a Date object.");
+                        //                 // }
+                        //                 return e;
+                        //             }
+                        //         }
+                    },
                     y2: {
                         type: 'linear',
                         position: 'left',
@@ -269,21 +269,21 @@
                             drawOnChartArea: false  // Prevents grid lines from overlapping
                         }
                     },
-                    // y3: {
-                    //     type: 'linear',
-                    //     position: 'left',
-                    //     title: {
-                    //         color:'ornage',
-                    //         display: true,
-                    //         text: 'Speed'
-                    //     },
-                    //     ticks:{
-                    //         color:'orange'
-                    //     },
-                    //     grid: {
-                    //         drawOnChartArea: false  // Prevents grid lines from overlapping
-                    //     }
-                    // },
+                    y3: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            color:'ornage',
+                            display: true,
+                            text: 'Speed'
+                        },
+                        ticks:{
+                            color:'orange'
+                        },
+                        grid: {
+                            drawOnChartArea: false  // Prevents grid lines from overlapping
+                        }
+                    },
                     // yTempMin: {
                     //     type: 'linear',
                     //     position: 'right',
