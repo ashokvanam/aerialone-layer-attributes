@@ -538,8 +538,10 @@
                                     },
                                     callback:function(e){
                                             //console.log('ticks:' + e)
+                                            var now = new Date(e);
                                             var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return  new Date(e).toDateString() + ' ' + time ;
+                                            const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+                                            return  formattedDate + ' ' + time ;
                                         },
                                 }
                             } 

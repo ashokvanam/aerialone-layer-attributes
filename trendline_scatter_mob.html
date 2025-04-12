@@ -451,19 +451,19 @@
                                     usePointStyle: true, // Use point style (e.g., circles)
                                 },
                                 },
-                                title: {
-                                    display: true, // Enable the title
-                                    text: title, // The title text
-                                    font: {
-                                            size: 18, // Font size
-                                            weight: 'bold' // Font weight
-                                    },
-                                    padding: {
-                                    top: 10,
-                                    bottom: 20
-                                    },
-                                    color: '#00ffc5' // Text color
-                                },
+                                // title: {
+                                //     display: true, // Enable the title
+                                //     text: title, // The title text
+                                //     font: {
+                                //             size: 18, // Font size
+                                //             weight: 'bold' // Font weight
+                                //     },
+                                //     padding: {
+                                //     top: 10,
+                                //     bottom: 20
+                                //     },
+                                //     color: '#00ffc5' // Text color
+                                // },
                                 tooltip: {
                                     callbacks: {
                                     label: function(context) {
@@ -523,6 +523,14 @@
                             // },
                             x:{
                                 type: 'time',
+                                time: {
+                                unit: 'week', // intervals: day, week, month, etc.
+                                tooltipFormat: 'yyyy-MM-dd',
+                                displayFormats: {
+                                    day: 'MMM dd'
+                                }
+                                },
+
                                 title:{
                                     display: true,
                                     text: 'Date',
@@ -540,8 +548,13 @@
                                     },
                                     callback:function(e){
                                             //console.log('ticks:' + e)
+                                            // var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                            // return  new Date(e).toDateString() + ' ' + time ;
+
+                                            var now = new Date(e);
                                             var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return  new Date(e).toDateString() + ' ' + time ;
+                                            const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+                                            return  formattedDate + ' ' + time ;
                                         },
                                 }
                             } 
@@ -735,7 +748,7 @@
 
                 
                 newMeasuredDataset.yAxisID = 'y' + yId;
-                newMeasuredDataset.xAxisID = 'x' + yId;
+                //newMeasuredDataset.xAxisID = 'x' + yId;
                 var yScale = generateGraphScale(newMeasuredDataset.yAxisID,'','Measurement',newMeasuredDataset.backgroundColor)
                 if (baseChartDataset.scales){
                     baseChartDataset.scales.push(yScale);

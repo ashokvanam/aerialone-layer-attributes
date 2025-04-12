@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
         body{
             background-color: black;
@@ -13,6 +14,12 @@
     <canvas id="myChart"></canvas>
 
     <script>
+        function formattedDateTicks(e){
+            var now = new Date(e);
+            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+            const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            return  formattedDate + ' ' + time ;
+        }
         function isDateWithinRange(in_date){
                 let fDate = '01-JAN-1999'
                 let tDate = '01-JAN-2001';
@@ -41,7 +48,7 @@
                         {     x: new Date("12-02-2024 02:00"),     "y": "65"},
                         {     x: new Date("12-03-2024 02:00"),     "y": "75"}],
                         borderColor: 'green',
-                        yAxisID: 'y1',showLine: true,xAxisID:'x1'
+                        yAxisID: 'y1',showLine: true
                     },
                     // {
                     //     label: 'Temp Min',
@@ -80,7 +87,7 @@
                         {     x: new Date("12-MAR-2023 02:00"),     "y": "9"},
                         {     x: new Date("25-APR-2023 02:00"),     "y": "5"}],
                         borderColor: 'pink',
-                        yAxisID: 'y2',showLine: true,xAxisID:'x2'
+                        yAxisID: 'y2',showLine: true
                     },
                     // {
                     //     label: 'Rainfall Min',
@@ -119,7 +126,7 @@
                         {     x: new Date("12-07-2024 02:00"),     "y": "2500"},
                         {     x: new Date("12-08-2024 02:00"),     "y": "2000"}],
                         borderColor: 'orange',
-                        yAxisID: 'y3',showLine: true,xAxisID:'x3'
+                        yAxisID: 'y3',showLine: true
                     },
                     // {
                     //     label: 'Wind Speed Max',
@@ -152,76 +159,138 @@
             options: {
                 responsive: true,
                 scales: {
-                    x1:{
-                                title:{
-                                    display: true,
-                                    text: 'Date',
-                                    color: 'green',
-                                    font: {
-                                    size: 16,
-                                    weight: 'bold',
-                                    family: 'Verdana'
-                                    }
-                                },
-                                ticks:{
-                                    color: 'green',
-                                    font: {
-                                    size: 14
-                                    },
-                                    callback:function(e){
-                                            //console.log('ticks:' + e)
-                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return  new Date(e).toDateString() + ' ' + time ;
-                                        },
+                    x:{
+                            title:{
+                                display: true,
+                                text: 'Date',
+                                color: 'green',
+                                font: {
+                                size: 16,
+                                weight: 'bold',
+                                family: 'Verdana'
                                 }
-                            } ,
-                            x2:{
-                                title:{
-                                    display: true,
-                                    text: 'Date',
-                                    color: 'pink',
-                                    font: {
-                                    size: 16,
-                                    weight: 'bold',
-                                    family: 'Verdana'
-                                    }
-                                },
-                                ticks:{
-                                    color: 'green',
-                                    font: {
-                                    size: 14
-                                    },
-                                    callback:function(e){
-                                            console.log('ticks:' + e)
-                                            console.log(new Date(e));
-                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return  new Date(e).toDateString() + ' ' + time ;
-                                        },
+                            },
+                            type:'time',
+                            time: {
+                                unit: 'month', // intervals: day, week, month, etc.
+                                tooltipFormat: 'yyyy-MM-dd',
+                                displayFormats: {
+                                    day: 'MMM dd'
                                 }
-                            } ,
-                            x3:{
-                                title:{
-                                    display: true,
-                                    text: 'Date',
-                                    color: 'orange',
-                                    font: {
-                                    size: 16,
-                                    weight: 'bold',
-                                    family: 'Verdana'
-                                    }
+                            },
+                            ticks:{
+                                color: 'green',
+                                font: {
+                                size: 14
                                 },
-                                ticks:{
-                                    color: 'green',
-                                    font: {
-                                    size: 14
+                                callback:function(e){
+                                        //console.log('ticks:' + e)
+                                        // var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                                        // return  new Date(e).toDateString() + ' ' + time ;
+                                        return formattedDateTicks(e);
                                     },
-                                    callback:function(e){
-                                            //console.log('ticks:' + e)
-                                            var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
-                                            return  new Date(e).toDateString() + ' ' + time ;
-                                        },
-                                }
-                            } ,
+                            }
+                        } ,
+                    // x1:{
+                    //         title:{
+                    //             display: true,
+                    //             text: 'Date',
+                    //             color: 'green',
+                    //             font: {
+                    //             size: 16,
+                    //             weight: 'bold',
+                    //             family: 'Verdana'
+                    //             }
+                    //         },
+                    //         type:'time',
+                    //         time: {
+                    //             unit: 'month', // intervals: day, week, month, etc.
+                    //             tooltipFormat: 'yyyy-MM-dd',
+                    //             displayFormats: {
+                    //                 day: 'MMM dd'
+                    //             }
+                    //         },
+                    //         ticks:{
+                    //             color: 'green',
+                    //             font: {
+                    //             size: 14
+                    //             },
+                    //             callback:function(e){
+                    //                     //console.log('ticks:' + e)
+                    //                     // var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                    //                     // return  new Date(e).toDateString() + ' ' + time ;
+                    //                     return formattedDateTicks(e);
+                    //                 },
+                    //         }
+                    //     } ,
+                    // x2:{
+                    //     title:{
+                    //         display: true,
+                    //         text: 'Date',
+                    //         color: 'pink',
+                    //         font: {
+                    //         size: 16,
+                    //         weight: 'bold',
+                    //         family: 'Verdana'
+                    //         }
+                    //     },
+                    //     type:'time',
+                    //     time: {
+                    //         unit: 'month', // intervals: day, week, month, etc.
+                    //         tooltipFormat: 'yyyy-MM-dd',
+                    //         displayFormats: {
+                    //             day: 'MMM dd'
+                    //         }
+                    //     },
+                    //     ticks:{
+                    //         color: 'pink',
+                    //         font: {
+                    //         size: 14
+                    //         },
+                    //         callback:function(e){
+                    //                 console.log('ticks:' + e)
+                    //                 console.log(new Date(e));
+                    //                 // var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                    //                 // return  new Date(e).toDateString() + ' ' + time ;
+                    //                 return formattedDateTicks(e);
+                             
+                    //             },
+                    //     }
+                    // } ,
+                    // x3:{
+                    //     title:{
+                    //         display: true,
+                    //         text: 'Date',
+                    //         color: 'orange',
+                    //         font: {
+                    //         size: 16,
+                    //         weight: 'bold',
+                    //         family: 'Verdana'
+                    //         }
+                    //     },
+                    //     type:'time',
+                    //     time: {
+                    //         unit: 'month', // intervals: day, week, month, etc.
+                    //         tooltipFormat: 'yyyy-MM-dd',
+                    //         displayFormats: {
+                    //             day: 'MMM dd'
+                    //         }
+                    //     },
+                    //     ticks:{
+                    //         // source: 'auto', // 'auto', 'data', or 'labels'
+                    //          autoSkip: true,
+                    //         color: 'orange',
+                    //         font: {
+                    //         size: 14
+                    //         },
+                    //         callback:function(e){
+                    //                 //console.log('ticks:' + e)
+                    //                 // var time = new Date(e).getHours() + ":"+ new Date(e).getMinutes() + ":"+new Date(e).getSeconds();
+                    //                 // return  new Date(e).toDateString() + ' ' + time ;
+                    //                 return formattedDateTicks(e);
+                    //             },
+                    //     }
+                    // } ,
                     y1: {
                         type: 'linear',
                         position: 'left',
