@@ -98,7 +98,7 @@
             function csvToDatasetByException(csvData,locid,exceptionType,fdate='',tdate=''){
                 let dataLimit = document.getElementById('selDataLimit').value;
                 if (!dataLimit){
-                    dataLimit = 5000;
+                    dataLimit = 100;
                 }
                 var t_exectpionType = '';
                 var t_itemType = '';
@@ -726,15 +726,16 @@
             }
             function mergeDataSets(baseChartDataset,newChartDataset=null){
                 let yId = baseChartDataset.dataSet.length;
-                if (!newChartDataset){
-                    // baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
-                    // var yScale = generateGraphScale(baseChartDataset.yAxisID,'','Measurement',baseChartDataset.backgroundColor)
-                    // if (baseChartDataset.scales){
-                    //     baseChartDataset.scales.push(yScale);
-                    // }
-                    // else{
-                    //     baseChartDataset.scales= [yScale];
-                    // }
+                if (!newChartDataset && baseChartDataset.dataSet.length == 1){
+                    baseChartDataset.dataSet[yId-1].yAxisID = 'y' + yId;
+                    var yScale = generateGraphScale(baseChartDataset.dataSet[yId-1].yAxisID,'','Measurement',baseChartDataset.dataSet[yId-1].backgroundColor)
+                    if (baseChartDataset.scales){
+                        baseChartDataset.scales.push(yScale);
+                    }
+                    else{
+                        baseChartDataset.scales= [yScale];
+                    }
+                    
                     return baseChartDataset;
                 }
                 var newMeasuredDataset = newChartDataset.dataSet[0];
@@ -747,7 +748,7 @@
                 //baseChartDataset.dataSet[2].data = baseChartDataset.dataSet[2].data.concat(newThreatenedDataset.data);
 
                 
-                newMeasuredDataset.yAxisID = 'y' + yId;
+                newMeasuredDataset.yAxisID = 'y' + (yId+1);
                 //newMeasuredDataset.xAxisID = 'x' + yId;
                 var yScale = generateGraphScale(newMeasuredDataset.yAxisID,'','Measurement',newMeasuredDataset.backgroundColor)
                 if (baseChartDataset.scales){
@@ -801,10 +802,19 @@
                         console.log(new Date(Date.now()).toTimeString())
                         console.log('Reading Selected Exception');
                         if (i==0){
-                           // chartDataSet.dataSet[0].backgroundColor = '#00ff00';
-                           // chartDataSet.dataSet[0].borderColor = '#00ff00';
-                            _chartDataset =  mergeDataSets(chartDataSet);
-                            
+                            chartDataSet.dataSet[0].backgroundColor = '#00FF00';
+                           chartDataSet.dataSet[0].borderColor = '#00FF00';
+                           _chartDataset =  mergeDataSets(chartDataSet);
+                        }
+                        else if (i==1){
+                            chartDataSet.dataSet[0].backgroundColor = '#FFA500';
+                           chartDataSet.dataSet[0].borderColor = '#FFA500';
+                           _chartDataset =  mergeDataSets(_chartDataset,chartDataSet);
+                        }
+                        else if (i==2){
+                           chartDataSet.dataSet[0].backgroundColor = '#FFC0CB';
+                           chartDataSet.dataSet[0].borderColor = '#FFC0CB';
+                           _chartDataset =  mergeDataSets(_chartDataset,chartDataSet);
                         }
                         else{
                             _chartDataset =  mergeDataSets(_chartDataset,chartDataSet);
@@ -1049,8 +1059,6 @@
                         <div class="slider-value1" id="slidervalue1">Start: 0</div>
                         <div class="slider-value2" id="slidervalue2">End: 100</div>
                     </div>
-                    
-                    
                 </div>
                 <canvas id="myChart"></canvas>
             </div>
@@ -1061,8 +1069,9 @@
                 <br>
                 <label for="selDataLimit">Max Records to Display</label>
                 <select id="selDataLimit" style="height: fit-content;">
+                    <option value="100">100</option>
                     <option value="2000">2000</option>
-                    <option value="5000" selected>5000</option>
+                    <option value="5000" selected >5000</option>
                     <option value="10000">10000</option>
                     <option value="100000">100000</option>
                 </select>
@@ -1071,9 +1080,6 @@
                     <!-- Options will be dynamically populated -->
                 </select>
             </div>
-        </div>   
-      
+        </div>
     </body>
-  
-      
 </html>
